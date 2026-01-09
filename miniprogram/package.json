@@ -1,0 +1,25 @@
+{
+    "name": "helpoldman-miniprogram",
+    "version": "1.0.0",
+    "description": "助老助残系统小程序端",
+    "main": "main.js",
+    "scripts": {
+        "dev": "npm run dev:mp-weixin",
+        "dev:mp-weixin": "cross-env NODE_ENV=development UNI_PLATFORM=mp-weixin vue-cli-service uni-serve",
+        "build": "npm run build:mp-weixin",
+        "build:mp-weixin": "cross-env NODE_ENV=production UNI_PLATFORM=mp-weixin vue-cli-service uni-build"
+    },
+    "dependencies": {
+        "vue": "^2.6.11",
+        "vuex": "^3.4.0"
+    },
+    "devDependencies": {
+        "@dcloudio/vue-cli-plugin-uni": "^2.0.0",
+        "babel-eslint": "^10.1.0",
+        "cross-env": "^7.0.2",
+        "eslint": "^6.8.0",
+        "eslint-plugin-vue": "^6.2.2"
+    },
+    "author": "",
+    "license": "MIT"
+}

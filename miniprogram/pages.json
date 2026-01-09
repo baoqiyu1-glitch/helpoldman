@@ -1,0 +1,188 @@
+{
+    "pages": [{
+            "path": "pages/auth/login",
+            "style": {
+                "navigationBarTitleText": "登录"
+            }
+        },
+        {
+            "path": "pages/auth/register",
+            "style": {
+                "navigationBarTitleText": "注册"
+            }
+        },
+        {
+            "path": "pages/common/index",
+            "style": {
+                "navigationBarTitleText": "首页"
+            }
+        },
+        {
+            "path": "pages/elder/personal",
+            "style": {
+                "navigationBarTitleText": "个人中心"
+            }
+        },
+        {
+            "path": "pages/elder/emergency-alert",
+            "style": {
+                "navigationBarTitleText": "紧急报警"
+            }
+        },
+        {
+            "path": "pages/elder/profile",
+            "style": {
+                "navigationBarTitleText": "个人档案"
+            }
+        },
+        {
+            "path": "pages/elder/shopping",
+            "style": {
+                "navigationBarTitleText": "代购生活物资"
+            }
+        },
+        {
+            "path": "pages/elder/housework",
+            "style": {
+                "navigationBarTitleText": "上门协助家务"
+            }
+        },
+        {
+            "path": "pages/elder/equipment",
+            "style": {
+                "navigationBarTitleText": "辅助器具申请"
+            }
+        },
+        {
+            "path": "pages/elder/barrier-free",
+            "style": {
+                "navigationBarTitleText": "无障碍改造申请"
+            }
+        },
+        {
+            "path": "pages/elder/training",
+            "style": {
+                "navigationBarTitleText": "技能培训"
+            }
+        },
+        {
+            "path": "pages/elder/community",
+            "style": {
+                "navigationBarTitleText": "社区互助"
+            }
+        },
+        {
+            "path": "pages/family/donation",
+            "style": {
+                "navigationBarTitleText": "爱心捐赠"
+            }
+        },
+        {
+            "path": "pages/family/learn",
+            "style": {
+                "navigationBarTitleText": "我要学习"
+            }
+        },
+        {
+            "path": "pages/family/nurse",
+            "style": {
+                "navigationBarTitleText": "申请护工"
+            }
+        },
+        {
+            "path": "pages/family/meal",
+            "style": {
+                "navigationBarTitleText": "送饭服务"
+            }
+        },
+        {
+            "path": "pages/family/shopping",
+            "style": {
+                "navigationBarTitleText": "代购物资"
+            }
+        },
+        {
+            "path": "pages/family/housework",
+            "style": {
+                "navigationBarTitleText": "协助家务"
+            }
+        },
+        {
+            "path": "pages/family/cooking",
+            "style": {
+                "navigationBarTitleText": "做饭送饭"
+            }
+        },
+        {
+            "path": "pages/volunteer/apply",
+            "style": {
+                "navigationBarTitleText": "志愿者申请"
+            }
+        },
+        {
+            "path": "pages/volunteer/profile",
+            "style": {
+                "navigationBarTitleText": "个人档案"
+            }
+        },
+        {
+            "path": "pages/volunteer/shopping",
+            "style": {
+                "navigationBarTitleText": "代购物资"
+            }
+        },
+        {
+            "path": "pages/volunteer/housework",
+            "style": {
+                "navigationBarTitleText": "协助家务"
+            }
+        },
+        {
+            "path": "pages/volunteer/training",
+            "style": {
+                "navigationBarTitleText": "培训技能"
+            }
+        },
+        {
+            "path": "pages/common/services",
+            "style": {
+                "navigationBarTitleText": "服务"
+            }
+        },
+        {
+            "path": "pages/common/message",
+            "style": {
+                "navigationBarTitleText": "消息"
+            }
+        }
+    ],
+    "globalStyle": {
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "助老助残系统",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "backgroundColor": "#F5F5F5"
+    },
+    "tabBar": {
+        "color": "#999999",
+        "selectedColor": "#007AFF",
+        "backgroundColor": "#FFFFFF",
+        "borderStyle": "black",
+        "list": [{
+                "pagePath": "pages/common/index",
+                "text": "首页"
+            },
+            {
+                "pagePath": "pages/common/services",
+                "text": "服务"
+            },
+            {
+                "pagePath": "pages/common/message",
+                "text": "消息"
+            },
+            {
+                "pagePath": "pages/elder/personal",
+                "text": "我的"
+            }
+        ]
+    }
+}

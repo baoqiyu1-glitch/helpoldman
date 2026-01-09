@@ -1,0 +1,65 @@
+
+.services-container.data-v-691ed0ce {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.header.data-v-691ed0ce {
+  padding: 30rpx;
+  background-color: #fff;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+.title.data-v-691ed0ce {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+.services-list.data-v-691ed0ce {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx;
+}
+.service-section.data-v-691ed0ce {
+  margin-bottom: 40rpx;
+}
+.service-section.data-v-691ed0ce:last-child {
+  margin-bottom: 0;
+}
+.section-title.data-v-691ed0ce {
+  font-size: 34rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  padding-left: 20rpx;
+  color: #333;
+  border-left: 4rpx solid #007AFF;
+}
+.service-item.data-v-691ed0ce {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  background-color: #f9f9f9;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+.service-item.data-v-691ed0ce:last-child {
+  margin-bottom: 0;
+}
+.service-icon.data-v-691ed0ce {
+  font-size: 60rpx;
+  margin-right: 30rpx;
+}
+.service-info.data-v-691ed0ce {
+  flex: 1;
+}
+.service-name.data-v-691ed0ce {
+  font-size: 32rpx;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10rpx;
+  color: #333;
+}
+.service-desc.data-v-691ed0ce {
+  font-size: 28rpx;
+  color: #666;
+}
+

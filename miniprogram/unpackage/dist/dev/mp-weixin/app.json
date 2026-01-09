@@ -1,0 +1,62 @@
+{
+  "pages": [
+    "pages/auth/login",
+    "pages/auth/register",
+    "pages/common/index",
+    "pages/elder/personal",
+    "pages/elder/emergency-alert",
+    "pages/elder/profile",
+    "pages/elder/shopping",
+    "pages/elder/housework",
+    "pages/elder/equipment",
+    "pages/elder/barrier-free",
+    "pages/elder/training",
+    "pages/elder/community",
+    "pages/family/donation",
+    "pages/family/learn",
+    "pages/family/nurse",
+    "pages/family/meal",
+    "pages/family/shopping",
+    "pages/family/housework",
+    "pages/family/cooking",
+    "pages/volunteer/apply",
+    "pages/volunteer/profile",
+    "pages/volunteer/shopping",
+    "pages/volunteer/housework",
+    "pages/volunteer/training",
+    "pages/common/services",
+    "pages/common/message"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "助老助残系统",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/common/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/common/services",
+        "text": "服务"
+      },
+      {
+        "pagePath": "pages/common/message",
+        "text": "消息"
+      },
+      {
+        "pagePath": "pages/elder/personal",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

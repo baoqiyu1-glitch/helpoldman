@@ -1,0 +1,111 @@
+
+.community-container.data-v-a2f26e8a {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.tab-bar.data-v-a2f26e8a {
+  display: flex;
+  background-color: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+.tab-item.data-v-a2f26e8a {
+  flex: 1;
+  text-align: center;
+  padding: 30rpx 0;
+  font-size: 32rpx;
+  color: #666;
+  border-bottom: 4rpx solid transparent;
+}
+.tab-item.active.data-v-a2f26e8a {
+  color: #007AFF;
+  border-bottom-color: #007AFF;
+}
+.content.data-v-a2f26e8a {
+  padding: 20rpx;
+}
+.publish-btn.data-v-a2f26e8a {
+  width: 100%;
+  height: 80rpx;
+  font-size: 32rpx;
+  background-color: #007AFF;
+  color: #fff;
+  margin-bottom: 20rpx;
+}
+.help-list.data-v-a2f26e8a, .offer-list.data-v-a2f26e8a {
+  background-color: #fff;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+.help-item.data-v-a2f26e8a, .offer-item.data-v-a2f26e8a {
+  padding: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+.help-item.data-v-a2f26e8a:last-child, .offer-item.data-v-a2f26e8a:last-child {
+  border-bottom: none;
+}
+.help-header.data-v-a2f26e8a, .offer-header.data-v-a2f26e8a {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.avatar.data-v-a2f26e8a {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+.user-info.data-v-a2f26e8a {
+  flex: 1;
+}
+.username.data-v-a2f26e8a {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 5rpx;
+}
+.time.data-v-a2f26e8a, .skill.data-v-a2f26e8a {
+  display: block;
+  font-size: 26rpx;
+  color: #999;
+}
+.help-content.data-v-a2f26e8a, .offer-content.data-v-a2f26e8a {
+  margin-bottom: 20rpx;
+}
+.title.data-v-a2f26e8a {
+  display: block;
+  font-size: 34rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+.desc.data-v-a2f26e8a {
+  display: block;
+  font-size: 30rpx;
+  color: #666;
+  line-height: 45rpx;
+}
+.available-time.data-v-a2f26e8a {
+  display: block;
+  font-size: 28rpx;
+  color: #999;
+  margin-top: 10rpx;
+}
+.help-footer.data-v-a2f26e8a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.status.data-v-a2f26e8a {
+  padding: 5rpx 15rpx;
+  background-color: #f0f0f0;
+  border-radius: 15rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+.help-btn.data-v-a2f26e8a, .contact-btn.data-v-a2f26e8a {
+  width: 150rpx;
+  height: 60rpx;
+  font-size: 28rpx;
+  background-color: #007AFF;
+  color: #fff;
+}
+

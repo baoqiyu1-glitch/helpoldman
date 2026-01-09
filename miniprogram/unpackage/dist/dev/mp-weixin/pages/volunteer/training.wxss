@@ -1,0 +1,81 @@
+
+.training-container.data-v-e8ea4b10 {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.training-list.data-v-e8ea4b10 {
+  background-color: #fff;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+.training-item.data-v-e8ea4b10 {
+  padding: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+.training-item.data-v-e8ea4b10:last-child {
+  border-bottom: none;
+}
+.training-image.data-v-e8ea4b10 {
+  width: 100%;
+  height: 250rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+.training-title.data-v-e8ea4b10 {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+  color: #333;
+}
+.training-desc.data-v-e8ea4b10 {
+  display: block;
+  font-size: 30rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+  line-height: 1.5;
+}
+.training-meta.data-v-e8ea4b10 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+.trainer.data-v-e8ea4b10 {
+  display: block;
+  font-size: 30rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+.training-actions.data-v-e8ea4b10 {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.apply-btn.data-v-e8ea4b10 {
+  width: 200rpx;
+  height: 60rpx;
+  font-size: 28rpx;
+  background-color: #007AFF;
+  color: #fff;
+}
+.status-text.data-v-e8ea4b10 {
+  font-size: 30rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 20rpx;
+}
+.status-text.ongoing.data-v-e8ea4b10 {
+  background-color: #cce7ff;
+  color: #007AFF;
+}
+.status-text.upcoming.data-v-e8ea4b10 {
+  background-color: #e6f7ff;
+  color: #00bfff;
+}
+.status-text.completed.data-v-e8ea4b10 {
+  background-color: #d4edda;
+  color: #28a745;
+}
+
