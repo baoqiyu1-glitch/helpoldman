@@ -1,59 +1,199 @@
 <template>
   <view class="shopping-container">
-    <view class="search-bar">
-      <input type="text" placeholder="搜索需要代购的商品" v-model="searchText" />
-      <button @click="search">搜索</button>
-    </view>
-    
-    <view class="category-list">
-      <view class="category-item" v-for="category in categories" :key="category.id" @click="selectCategory(category)">
-        <text>{{ category.name }}</text>
+    <!-- 代购需求发布区域 -->
+    <view class="demand-section">
+      <view class="section-title">
+        <text>发布代购需求</text>
+      </view>
+      <view class="demand-form">
+        <view class="form-item">
+          <text class="label">代购物品</text>
+          <textarea placeholder="请详细描述需要代购的物品清单" v-model="demandForm.serviceContent" style="height: 120rpx;"></textarea>
+        </view>
+        <view class="form-item">
+          <text class="label">期望送达时间</text>
+          <picker mode="date" :value="demandForm.appointmentTime" @change="onDateChange">
+            <view class="picker">{{ demandForm.appointmentTime || '请选择日期' }}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="label">送达地址</text>
+          <input type="text" placeholder="请输入详细地址" v-model="demandForm.address" />
+        </view>
+        <view class="form-item">
+          <text class="label">联系电话</text>
+          <input type="text" placeholder="请输入联系电话" v-model="demandForm.contactPhone" />
+        </view>
+        <view class="form-item">
+          <text class="label">备注信息</text>
+          <textarea placeholder="请输入特殊要求或备注" v-model="demandForm.remarks" style="height: 80rpx;"></textarea>
+        </view>
+        <button type="primary" @click="submitDemand">发布代购需求</button>
       </view>
     </view>
-    
-    <view class="product-list">
-      <view class="product-item" v-for="product in products" :key="product.id">
-        <image class="product-image" :src="product.image" mode="aspectFill"></image>
-        <view class="product-info">
-          <text class="product-name">{{ product.name }}</text>
-          <text class="product-price">¥{{ product.price }}</text>
-          <button class="add-btn" @click="addProduct(product)">加入购物车</button>
+
+    <!-- 商品浏览区域（保留原有功能） -->
+    <view class="browse-section">
+      <view class="section-title">
+        <text>商品浏览</text>
+      </view>
+      <view class="search-bar">
+        <input type="text" placeholder="搜索需要代购的商品" v-model="searchText" />
+        <button @click="search">搜索</button>
+      </view>
+      
+      <view class="category-list">
+        <view class="category-item" v-for="category in categories" :key="category.id" @click="selectCategory(category)">
+          <text>{{ category.name }}</text>
         </view>
       </view>
-    </view>
-    
-    <view class="cart-bar" v-if="cartCount > 0">
-      <text class="cart-count">{{ cartCount }}</text>
-      <button type="primary" @click="goToCart">去结算</button>
+      
+      <view class="product-list">
+        <view class="product-item" v-for="product in products" :key="product.id">
+          <image class="product-image" :src="product.image" mode="aspectFill"></image>
+          <view class="product-info">
+            <text class="product-name">{{ product.name }}</text>
+            <text class="product-price">¥{{ product.price }}</text>
+            <button class="add-btn" @click="addProduct(product)">加入购物车</button>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
 
 <script>
+import { shoppingService } from '../../utils/api'
+
 export default {
   data() {
     return {
+      // 代购需求表单数据
+      demandForm: {
+        serviceContent: '',
+        appointmentTime: '',
+        address: '',
+        contactPhone: '',
+        remarks: ''
+      },
+      // 原有商品浏览数据
       searchText: '',
-      categories: [
-        { id: 1, name: '食品' },
-        { id: 2, name: '日用品' },
-        { id: 3, name: '药品' },
-        { id: 4, name: '其他' }
-      ],
-      products: [
-        { id: 1, name: '大米', price: 50, image: '../../static/images/rice.png', categoryId: 1 },
-        { id: 2, name: '面粉', price: 30, image: '../../static/images/flour.png', categoryId: 1 },
-        { id: 3, name: '食用油', price: 80, image: '../../static/images/oil.png', categoryId: 1 },
-        { id: 4, name: '洗发水', price: 45, image: '../../static/images/shampoo.png', categoryId: 2 },
-        { id: 5, name: '牙膏', price: 15, image: '../../static/images/toothpaste.png', categoryId: 2 }
-      ],
+      categories: [],
+      products: [],
       cartCount: 0
     }
   },
   onLoad() {
-    // 初始化数据
+    this.loadShoppingData()
+    // 初始化默认日期为今天
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    this.demandForm.appointmentTime = `${year}-${month}-${day}`
   },
   methods: {
+    async loadShoppingData() {
+      try {
+        uni.showLoading({ title: '加载中...' })
+        // 加载商品分类
+        const categoryRes = await shoppingService.getCategories()
+        if (categoryRes.code === 200) {
+          this.categories = categoryRes.data
+        }
+        
+        // 加载商品列表
+        const productRes = await shoppingService.getProducts()
+        if (productRes.code === 200) {
+          this.products = productRes.data
+        }
+      } catch (error) {
+        console.error('加载商品数据失败:', error)
+        uni.showToast({ title: '加载失败', icon: 'none' })
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    
+    // 代购需求相关方法
+    onDateChange(e) {
+      this.demandForm.appointmentTime = e.detail.value
+    },
+    
+    async submitDemand() {
+      if (!this.validateDemandForm()) {
+        uni.showToast({ title: '请填写完整信息', icon: 'none' })
+        return
+      }
+      
+      const demandData = {
+        serviceTypeId: 5, // 代购服务的类型ID应该是5
+        serviceContent: this.demandForm.serviceContent + (this.demandForm.remarks ? `\n备注：${this.demandForm.remarks}` : ''),
+        appointmentTime: this.demandForm.appointmentTime,
+        address: this.demandForm.address,
+        contactPhone: this.demandForm.contactPhone
+      }
+      
+      try {
+        uni.showLoading({ title: '发布中...' })
+        console.log('发送代购申请数据:', demandData)
+        
+        const response = await shoppingService.applyService(demandData)
+        console.log('代购申请接口返回:', response) 
+        
+        // 修复：正确解析响应结构
+        if (response && response.code === 200) {
+          // 成功处理
+          uni.showToast({
+            title: response.message || '代购需求发布成功',
+            icon: 'success',
+            duration: 2000
+          });
+          
+          // 发布成功后延迟返回上一页
+          setTimeout(() => {
+            uni.navigateBack();
+          }, 1500);
+        } else {
+          // 失败处理
+          uni.showToast({
+            title: response?.message || '发布失败',
+            icon: 'none',
+            duration: 3000
+          });
+        }
+      } catch (error) {
+        console.error('发布代购需求失败:', error)
+        uni.showToast({ title: '网络错误，请重试', icon: 'none' })
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    
+    validateDemandForm() {
+      return this.demandForm.serviceContent && 
+             this.demandForm.appointmentTime && 
+             this.demandForm.address && 
+             this.demandForm.contactPhone
+    },
+    
+    resetDemandForm() {
+      this.demandForm = {
+        serviceContent: '',
+        appointmentTime: '',
+        address: '',
+        contactPhone: '',
+        remarks: ''
+      }
+      // 重新设置默认日期
+      const today = new Date()
+      const year = today.getFullYear()
+      const month = String(today.getMonth() + 1).padStart(2, '0')
+      const day = String(today.getDate()).padStart(2, '0')
+      this.demandForm.appointmentTime = `${year}-${month}-${day}`
+    },
+    
+    // 原有商品浏览方法
     search() {
       // 搜索商品
     },
@@ -63,9 +203,6 @@ export default {
     addProduct(product) {
       // 添加商品到购物车
       this.cartCount++
-    },
-    goToCart() {
-      // 跳转到购物车页面
     }
   }
 }
@@ -76,6 +213,72 @@ export default {
   padding: 20rpx;
   background-color: #f5f5f5;
   min-height: 100vh;
+}
+
+/* 代购需求区域样式 */
+.demand-section {
+  background-color: #fff;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+
+.section-title {
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  border-bottom: 1rpx solid #eee;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.demand-form {
+  padding: 20rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  margin-bottom: 10rpx;
+  color: #333;
+}
+
+.demand-form input,
+.demand-form textarea {
+  width: 100%;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+
+.picker {
+  width: 100%;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+
+.demand-form button {
+  width: 100%;
+  height: 80rpx;
+  font-size: 32rpx;
+  background-color: #007AFF;
+  color: #fff;
+  border-radius: 10rpx;
+}
+
+/* 商品浏览区域样式 */
+.browse-section {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx;
 }
 
 .search-bar {
@@ -166,6 +369,7 @@ export default {
   background-color: #007AFF;
   color: #fff;
 }
+</style>
 
 .cart-bar {
   position: fixed;

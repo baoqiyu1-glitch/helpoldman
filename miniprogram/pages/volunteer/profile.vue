@@ -3,79 +3,79 @@
     <view class="profile-header">
       <image class="avatar" src="../../static/images/volunteer-avatar.png" mode="aspectFill"></image>
       <view class="user-info">
-        <text class="username">志愿者：{{ userInfo.name }}</text>
+        <text class="username">{{ textConfig.volunteerText || '志愿者' }}：{{ userInfo.name }}</text>
         <text class="user-status" :class="{ active: userInfo.status === 'active' }">
-          {{ userInfo.status === 'active' ? '已认证' : '待认证' }}
+          {{ userInfo.status === 'active' ? textConfig.certifiedText || '已认证' : textConfig.pendingText || '待认证' }}
         </text>
       </view>
     </view>
     
     <view class="profile-content">
       <view class="info-section">
-        <text class="section-title">基本信息</text>
+        <text class="section-title">{{ textConfig.basicInfoText || '基本信息' }}</text>
         
         <view class="info-item">
-          <text class="label">姓名</text>
+          <text class="label">{{ textConfig.nameText || '姓名' }}</text>
           <text class="value">{{ userInfo.name }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">性别</text>
+          <text class="label">{{ textConfig.genderText || '性别' }}</text>
           <text class="value">{{ userInfo.gender }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">年龄</text>
-          <text class="value">{{ userInfo.age }}岁</text>
+          <text class="label">{{ textConfig.ageText || '年龄' }}</text>
+          <text class="value">{{ userInfo.age }}{{ textConfig.ageUnit || '岁' }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">联系电话</text>
+          <text class="label">{{ textConfig.phoneText || '联系电话' }}</text>
           <text class="value">{{ userInfo.phone }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">邮箱</text>
+          <text class="label">{{ textConfig.emailText || '邮箱' }}</text>
           <text class="value">{{ userInfo.email }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">居住地址</text>
+          <text class="label">{{ textConfig.addressText || '居住地址' }}</text>
           <text class="value">{{ userInfo.address }}</text>
         </view>
       </view>
       
       <view class="info-section">
-        <text class="section-title">服务信息</text>
+        <text class="section-title">{{ textConfig.serviceInfoText || '服务信息' }}</text>
         
         <view class="info-item">
-          <text class="label">擅长领域</text>
-          <text class="value">{{ userInfo.skills.join('、') }}</text>
+          <text class="label">{{ textConfig.skillsText || '擅长领域' }}</text>
+          <text class="value">{{ userInfo.skills.join(textConfig.skillSeparator || '、') }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">可服务时间</text>
+          <text class="label">{{ textConfig.availableTimeText || '可服务时间' }}</text>
           <text class="value">{{ userInfo.availableTime }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">服务次数</text>
+          <text class="label">{{ textConfig.serviceCountText || '服务次数' }}</text>
           <text class="value">{{ userInfo.serviceCount }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">服务时长</text>
-          <text class="value">{{ userInfo.serviceHours }}小时</text>
+          <text class="label">{{ textConfig.serviceHoursText || '服务时长' }}</text>
+          <text class="value">{{ userInfo.serviceHours }}{{ textConfig.hoursUnit || '小时' }}</text>
         </view>
         
         <view class="info-item">
-          <text class="label">用户评价</text>
-          <text class="value">{{ userInfo.rating }}分</text>
+          <text class="label">{{ textConfig.ratingText || '用户评价' }}</text>
+          <text class="value">{{ userInfo.rating }}{{ textConfig.ratingUnit || '分' }}</text>
         </view>
       </view>
     </view>
     
-    <button class="edit-btn" @click="editProfile">编辑资料</button>
+    <button class="edit-btn" @click="editProfile">{{ textConfig.editProfileText || '编辑资料' }}</button>
   </view>
 </template>
 
@@ -96,10 +96,72 @@ export default {
         serviceHours: 36,
         rating: 4.8,
         status: 'active'
-      }
+      },
+      textConfig: {}
     }
   },
+  
+  onLoad() {
+    this.loadTextConfig()
+    this.loadUserInfo()
+  },
+  
   methods: {
+    async loadTextConfig() {
+      try {
+        const res = await this.$request.get('/volunteer/text-config')
+        if (res.code === 200) {
+          this.textConfig = res.data
+          // 设置页面标题
+          uni.setNavigationBarTitle({
+            title: this.textConfig.profilePageTitle || '志愿者资料'
+          })
+        }
+      } catch (error) {
+        console.error('加载文字配置失败:', error)
+        this.setDefaultTextConfig()
+      }
+    },
+    
+    async loadUserInfo() {
+      try {
+        const res = await this.$request.get('/volunteer/profile')
+        if (res.code === 200) {
+          this.userInfo = res.data
+        }
+      } catch (error) {
+        console.error('加载用户信息失败:', error)
+        // 使用默认数据
+      }
+    },
+    
+    setDefaultTextConfig() {
+      this.textConfig = {
+        volunteerText: '志愿者',
+        certifiedText: '已认证',
+        pendingText: '待认证',
+        basicInfoText: '基本信息',
+        nameText: '姓名',
+        genderText: '性别',
+        ageText: '年龄',
+        ageUnit: '岁',
+        phoneText: '联系电话',
+        emailText: '邮箱',
+        addressText: '居住地址',
+        serviceInfoText: '服务信息',
+        skillsText: '擅长领域',
+        skillSeparator: '、',
+        availableTimeText: '可服务时间',
+        serviceCountText: '服务次数',
+        serviceHoursText: '服务时长',
+        hoursUnit: '小时',
+        ratingText: '用户评价',
+        ratingUnit: '分',
+        editProfileText: '编辑资料',
+        profilePageTitle: '志愿者资料'
+      }
+    },
+    
     editProfile() {
       // 跳转到编辑资料页面
       uni.navigateTo({

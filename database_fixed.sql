@@ -156,6 +156,132 @@ CREATE TABLE donations (
     FOREIGN KEY (donor_id) REFERENCES users(id)
 );
 
+
+-- 在数据库中执行以下SQL创建消息表
+CREATE TABLE `messages` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  `title` varchar(100) NOT NULL COMMENT '消息标题',
+  `content` text NOT NULL COMMENT '消息内容',
+  `type` varchar(20) NOT NULL COMMENT '消息类型',
+  `is_read` tinyint(1) DEFAULT '0' COMMENT '是否已读',
+  `icon` varchar(20) DEFAULT NULL COMMENT '消息图标',
+  `desc` varchar(200) DEFAULT NULL COMMENT '消息简短描述',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` tinyint(1) DEFAULT '0' COMMENT '是否删除',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息表';
+-- 在现有数据库文件末尾添加缺失的表结构
+
+-- 社区互助表
+CREATE TABLE community_help (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL COMMENT '发布者ID',
+    title VARCHAR(200) NOT NULL COMMENT '标题',
+    description TEXT COMMENT '详细描述',
+    help_type ENUM('REQUEST', 'OFFER') DEFAULT 'REQUEST' COMMENT '类型：REQUEST-求助, OFFER-提供帮助',
+    skill VARCHAR(100) COMMENT '技能类型',
+    available_time VARCHAR(200) COMMENT '可提供帮助时间',
+    status ENUM('PENDING', 'IN_PROGRESS', 'COMPLETED') DEFAULT 'PENDING' COMMENT '状态',
+    helper_id BIGINT COMMENT '帮助者ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (helper_id) REFERENCES users(id)
+);
+
+-- 无障碍改造申请表
+CREATE TABLE barrier_free_renovation (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL COMMENT '申请人ID',
+    renovation_type VARCHAR(100) NOT NULL COMMENT '改造类型',
+    address VARCHAR(200) NOT NULL COMMENT '改造地址',
+    phone VARCHAR(20) COMMENT '联系电话',
+    description TEXT COMMENT '改造需求描述',
+    status ENUM('PENDING', 'APPROVED', 'IN_PROGRESS', 'COMPLETED') DEFAULT 'PENDING' COMMENT '状态',
+    images VARCHAR(500) COMMENT '现场照片URL，多个用逗号分隔',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 护工服务表
+CREATE TABLE nursing_services (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL COMMENT '申请人ID',
+    elder_id BIGINT NOT NULL COMMENT '老人ID',
+    service_type VARCHAR(100) NOT NULL COMMENT '服务类型',
+    service_time DATETIME NOT NULL COMMENT '服务时间',
+    address VARCHAR(200) NOT NULL COMMENT '服务地址',
+    contact_phone VARCHAR(20) COMMENT '联系电话',
+    requirements TEXT COMMENT '特殊要求',
+    status ENUM('PENDING', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED') DEFAULT 'PENDING' COMMENT '状态',
+    nurse_id BIGINT COMMENT '护工ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (elder_id) REFERENCES users(id),
+    FOREIGN KEY (nurse_id) REFERENCES users(id)
+);
+
+-- 送饭服务表
+CREATE TABLE meal_delivery (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL COMMENT '申请人ID',
+    elder_id BIGINT NOT NULL COMMENT '老人ID',
+    meal_type VARCHAR(50) NOT NULL COMMENT '餐食类型',
+    delivery_time DATETIME NOT NULL COMMENT '送餐时间',
+    address VARCHAR(200) NOT NULL COMMENT '送餐地址',
+    contact_phone VARCHAR(20) COMMENT '联系电话',
+    special_requirements TEXT COMMENT '特殊要求',
+    status ENUM('PENDING', 'PREPARING', 'DELIVERING', 'COMPLETED') DEFAULT 'PENDING' COMMENT '状态',
+    deliverer_id BIGINT COMMENT '送餐员ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (elder_id) REFERENCES users(id),
+    FOREIGN KEY (deliverer_id) REFERENCES users(id)
+);
+
+-- 补助申请表
+CREATE TABLE subsidy_applications (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL COMMENT '申请人ID',
+    subsidy_type VARCHAR(100) NOT NULL COMMENT '补助类型',
+    applied_amount DECIMAL(10,2) NOT NULL COMMENT '申请金额',
+    application_reason TEXT NOT NULL COMMENT '申请理由',
+    supporting_documents VARCHAR(500) COMMENT '证明材料URL',
+    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING' COMMENT '状态',
+    review_comments TEXT COMMENT '审核意见',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 新闻表
+CREATE TABLE IF NOT EXISTS news (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL COMMENT '新闻标题',
+    content TEXT COMMENT '新闻内容',
+    author VARCHAR(100) DEFAULT '系统管理员' COMMENT '发布者',
+    news_type VARCHAR(50) DEFAULT 'SYSTEM' COMMENT '新闻类型：SYSTEM-系统通知, ACTIVITY-活动通知, UPDATE-更新通知',
+    image_url VARCHAR(500) COMMENT '新闻图片',
+    status VARCHAR(20) DEFAULT 'PUBLISHED' COMMENT '状态：DRAFT-草稿, PUBLISHED-已发布',
+    publish_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 插入测试新闻数据
+INSERT INTO news (title, content, news_type, image_url) VALUES
+('新的志愿者已加入平台', '热烈欢迎10名新志愿者加入我们的助老助残平台，他们将为大家提供更优质的服务。', 'SYSTEM', '/static/images/news1.jpg'),
+('系统更新维护通知', '平台将于明天凌晨2-4点进行系统维护，期间可能无法正常访问，敬请谅解。', 'UPDATE', '/static/images/news2.jpg'),
+('社区活动通知', '本周六下午2点在社区活动中心举办老年人智能手机使用培训，欢迎参加。', 'ACTIVITY', '/static/images/news3.jpg'),
+('服务优化公告', '我们对代购服务进行了优化，现在支持更多商品种类和更快的配送服务。', 'SYSTEM', '/static/images/news4.jpg');
+
+
 -- 插入基础数据（使用英文避免编码问题）
 INSERT INTO service_types (name, code, description, sort_order) VALUES
 ('Purchase', 'PURCHASE', 'Help purchase daily necessities', 1),
@@ -180,3 +306,58 @@ INSERT INTO users (username, password, real_name, phone, age, gender, user_type,
 ('oldman001', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTV2UiK', 'Zhang Daye', '13800138001', 75, 'MALE', 'ELDER', 'Beijing Chaoyang District', 'oldman001@helpoldman.com'),
 ('volunteer001', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTV2UiK', 'Wang Volunteer', '13800138002', 28, 'MALE', 'VOLUNTEER', 'Beijing Chaoyang District', 'volunteer001@helpoldman.com'),
 ('family001', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTV2UiK', 'Li Family', '13800138003', 45, 'FEMALE', 'FAMILY', 'Beijing Chaoyang District', 'family001@helpoldman.com');
+
+-- 插入一些测试数据
+INSERT INTO `messages` (`user_id`, `title`, `content`, `type`, `is_read`, `icon`, `desc`) VALUES
+(1, '系统通知', '您的服务申请已通过审核', 'SYSTEM', 0, '📢', '您的服务申请已通过审核'),
+(1, '志愿者消息', '李志愿者已接受您的帮助请求', 'VOLUNTEER', 0, '👥', '李志愿者已接受您的帮助请求'),
+(1, '培训提醒', '明天下午2点有智能手机培训', 'TRAINING', 1, '📅', '明天下午2点有智能手机培训'),
+(1, '系统通知', '平台将于明天凌晨2-4点进行维护', 'SYSTEM', 1, '📢', '平台将于明天凌晨2-4点进行维护');
+
+-- 商品分类表
+CREATE TABLE product_categories (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL COMMENT '分类名称',
+    code VARCHAR(50) NOT NULL UNIQUE COMMENT '分类代码',
+    description TEXT COMMENT '分类描述',
+    sort_order INT DEFAULT 0 COMMENT '排序顺序',
+    status VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE-激活, INACTIVE-未激活',
+    icon VARCHAR(200) COMMENT '图标URL',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 商品表
+CREATE TABLE products (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(200) NOT NULL COMMENT '商品名称',
+    code VARCHAR(50) NOT NULL UNIQUE COMMENT '商品代码',
+    description TEXT COMMENT '商品描述',
+    price DECIMAL(10,2) NOT NULL COMMENT '价格',
+    category_id BIGINT NOT NULL COMMENT '分类ID',
+    image_url VARCHAR(500) COMMENT '商品图片URL',
+    stock INT DEFAULT 0 COMMENT '库存数量',
+    unit VARCHAR(20) DEFAULT '个' COMMENT '单位',
+    status VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE-激活, INACTIVE-未激活',
+    brand VARCHAR(100) COMMENT '品牌',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES product_categories(id)
+);
+
+-- 插入商品分类基础数据
+INSERT INTO product_categories (name, code, description, sort_order, icon) VALUES
+('食品', 'FOOD', '各类食品和饮料', 1, '/static/images/food.png'),
+('日用品', 'DAILY_USE', '日常生活用品', 2, '/static/images/daily.png'),
+('药品', 'MEDICINE', '常用药品和保健品', 3, '/static/images/medicine.png'),
+('其他', 'OTHER', '其他商品', 4, '/static/images/other.png');
+
+-- 插入商品基础数据
+INSERT INTO products (name, code, description, price, category_id, image_url, stock, unit, brand) VALUES
+('大米', 'RICE', '优质东北大米5kg装', 68.00, 1, '/static/images/rice.png', 100, '袋', '金龙鱼'),
+('面粉', 'FLOUR', '高筋面粉5kg装', 30.00, 1, '/static/images/flour.png', 80, '袋', '五得利'),
+('食用油', 'OIL', '纯正花生油5L装', 80.00, 1, '/static/images/oil.png', 60, '桶', '鲁花'),
+('洗发水', 'SHAMPOO', '去屑止痒洗发水500ml', 45.00, 2, '/static/images/shampoo.png', 120, '瓶', '海飞丝'),
+('牙膏', 'TOOTHPASTE', '防蛀美白牙膏180g', 15.00, 2, '/static/images/toothpaste.png', 200, '支', '佳洁士'),
+('感冒药', 'COLD_MEDICINE', '感冒清热颗粒', 25.00, 3, '/static/images/cold-medicine.png', 50, '盒', '同仁堂'),
+('血压计', 'BLOOD_PRESSURE_MONITOR', '电子血压计', 199.00, 4, '/static/images/blood-pressure.png', 30, '台', '欧姆龙');

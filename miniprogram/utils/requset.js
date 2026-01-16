@@ -74,6 +74,7 @@ class Request {
                 return Promise.reject(new Error(result.message || '请求失败'))
             }
 
+            // 修复：返回完整的响应对象，而不是只返回data字段
             if (result.code !== 200) {
                 uni.showToast({
                     title: result.message || '操作失败',
@@ -82,7 +83,8 @@ class Request {
                 return Promise.reject(new Error(result.message || '操作失败'))
             }
 
-            return result.data
+            // 修复：返回完整的响应对象，包含code、message、data
+            return result
         } catch (error) {
             uni.showToast({
                 title: '请求失败',

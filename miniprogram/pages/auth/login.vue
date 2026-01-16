@@ -39,25 +39,80 @@ export default {
       }
 
       try {
-        const data = await this.$request.post('/auth/login', {
+        const response = await this.$request.post('/auth/login', {
           username: this.username,
           password: this.password
         })
         
-        // 保存token和用户信息
-        this.$request.setToken(data.token)
-        uni.setStorageSync('userInfo', data.user)
+        // 修复：正确解析响应结构
+        console.log('登录接口完整响应:', response)
         
-        uni.showToast({
-          title: '登录成功',
-          icon: 'success'
-        })
-        
-        uni.switchTab({
-          url: '/pages/common/index'
-        })
+        if (response && response.code === 200) {
+          // 保存token和用户信息
+          this.$request.setToken(response.data.token)
+          uni.setStorageSync('userInfo', response.data.user)
+          
+          // 调试信息：打印用户类型
+          console.log('登录用户信息:', response.data.user)
+          console.log('用户类型:', response.data.user.userType)
+          
+          uni.showToast({
+            title: '登录成功',
+            icon: 'success'
+          })
+          
+          // 根据用户类型跳转到不同页面
+          this.redirectByUserType(response.data.user.userType)
+        } else {
+          // 处理登录失败的情况
+          uni.showToast({
+            title: response.message || '登录失败',
+            icon: 'none'
+          })
+        }
       } catch (error) {
         console.error('登录失败', error)
+        uni.showToast({
+          title: '登录失败，请检查用户名和密码',
+          icon: 'none'
+        })
+      }
+    },
+    
+    redirectByUserType(userType) {
+      console.log('根据用户类型跳转:', userType)
+      
+      // 根据用户类型跳转到不同页面
+      switch(userType) {
+        case 'volunteer':
+          // 志愿者跳转到志愿者首页（使用reLaunch关闭所有页面并打开新页面）
+          uni.reLaunch({
+            url: '/pages/volunteer/index'
+          })
+          break
+        case 'elder':
+          // 老人用户跳转到老人首页（使用tabBar页面）
+          uni.switchTab({
+            url: '/pages/elder/personal'
+          })
+          break
+        case 'family':
+          // 家人用户跳转到家人首页（使用reLaunch关闭所有页面并打开新页面）
+          uni.reLaunch({
+            url: '/pages/family/index'
+          })
+          break
+        case 'admin':
+          // 管理员跳转到管理员首页（需要创建）
+          uni.switchTab({
+            url: '/pages/common/index'
+          })
+          break
+        default:
+          // 默认跳转到通用首页
+          uni.switchTab({
+            url: '/pages/common/index'
+          })
       }
     }
   }

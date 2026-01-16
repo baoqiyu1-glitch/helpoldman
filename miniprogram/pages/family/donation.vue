@@ -1,5 +1,20 @@
 <template>
   <view class="donation-container">
+    <!-- 老人选择 -->
+    <view class="elder-selection" v-if="elders.length > 0">
+      <text class="section-title">选择捐赠对象</text>
+      <view class="elder-list">
+        <view class="elder-item" 
+              v-for="elder in elders" 
+              :key="elder.id"
+              :class="{ active: selectedElder && selectedElder.id === elder.id }"
+              @click="selectElder(elder)">
+          <text class="elder-name">{{ elder.name }}</text>
+          <text class="elder-relation">{{ elder.relation }}</text>
+        </view>
+      </view>
+    </view>
+
     <view class="donation-intro">
       <text class="title">爱心捐赠</text>
       <text class="desc">感谢您的爱心捐赠，您的每一份贡献都将帮助到需要帮助的老人。</text>
@@ -36,8 +51,11 @@
 export default {
   data() {
     return {
-      amountOptions: ['50', '100', '200', '500', 'custom'],
-      selectedAmount: '50',
+      elders: [],
+      selectedElder: null,
+      donationInfo: {},
+      amountOptions: [],
+      selectedAmount: '',
       customAmount: '',
       donorInfo: {
         name: '',
@@ -46,37 +64,89 @@ export default {
       }
     }
   },
+  onLoad() {
+    this.loadElders()
+    this.loadDonationInfo()
+  },
   methods: {
+    async loadElders() {
+      try {
+        const res = await this.$request.get('/family/elders')
+        if (res.code === 200) {
+          this.elders = res.data
+          if (this.elders.length > 0) {
+            this.selectElder(this.elders[0])
+          }
+        }
+      } catch (error) {
+        console.error('加载老人列表失败:', error)
+      }
+    },
+    
+    selectElder(elder) {
+      this.selectedElder = elder
+    },
+    
+    async loadDonationInfo() {
+      try {
+        const res = await this.$request.get('/donation/info')
+        if (res.code === 200) {
+          this.donationInfo = res.data
+          this.amountOptions = res.data.amountOptions || ['50', '100', '200', '500', 'custom']
+        }
+      } catch (error) {
+        console.error('加载捐赠信息失败:', error)
+      }
+    },
+    
     selectAmount(amount) {
       this.selectedAmount = amount
+      if (amount !== 'custom') {
+        this.customAmount = ''
+      }
     },
-    submitDonation() {
+    
+    async submitDonation() {
       if (!this.validateForm()) {
         uni.showToast({ title: '请填写完整信息', icon: 'none' })
         return
       }
       
-      const donationData = {
-        amount: this.selectedAmount === 'custom' ? this.customAmount : this.selectedAmount,
-        ...this.donorInfo
+      if (!this.selectedElder) {
+        uni.showToast({ title: '请选择捐赠对象', icon: 'none' })
+        return
       }
       
-      uni.showLoading({ title: '捐赠处理中...' })
-      // 这里替换为实际支付API调用
-      setTimeout(() => {
-        uni.hideLoading()
-        uni.showToast({ title: '捐赠成功，感谢您的爱心！' })
-        this.resetForm()
-      }, 1500)
-    },
-    validateForm() {
-      if (this.selectedAmount === 'custom' && !this.customAmount) {
-        return false
+      const donationData = {
+        amount: this.selectedAmount === 'custom' ? this.customAmount : this.selectedAmount,
+        ...this.donorInfo,
+        elderId: this.selectedElder.id
       }
-      return this.donorInfo.name && this.donorInfo.phone
+      
+      try {
+        uni.showLoading({ title: '捐赠处理中...' })
+        const res = await this.$request.post('/donation/submit', donationData)
+        uni.hideLoading()
+        
+        if (res.code === 200) {
+          uni.showToast({ title: '捐赠成功，感谢您的爱心！' })
+          this.resetForm()
+        } else {
+          uni.showToast({ title: res.message || '捐赠失败', icon: 'none' })
+        }
+      } catch (error) {
+        uni.hideLoading()
+        uni.showToast({ title: '网络错误，请重试', icon: 'none' })
+      }
     },
+    
+    validateForm() {
+      const amount = this.selectedAmount === 'custom' ? this.customAmount : this.selectedAmount
+      return amount && this.donorInfo.name && this.donorInfo.phone
+    },
+    
     resetForm() {
-      this.selectedAmount = '50'
+      this.selectedAmount = ''
       this.customAmount = ''
       this.donorInfo = {
         name: '',
@@ -93,6 +163,53 @@ export default {
   padding: 20rpx;
   background-color: #f5f5f5;
   min-height: 100vh;
+}
+
+.section-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  color: #333;
+}
+
+.elder-selection {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.elder-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.elder-item {
+  padding: 20rpx 30rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 10rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 150rpx;
+}
+
+.elder-item.active {
+  border-color: #007AFF;
+  background-color: #f0f8ff;
+}
+
+.elder-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.elder-relation {
+  font-size: 24rpx;
+  color: #666;
 }
 
 .donation-intro {

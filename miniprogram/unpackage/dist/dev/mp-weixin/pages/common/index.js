@@ -103,6 +103,22 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
+  var l0 = _vm.__map(_vm.news, function (item, index) {
+    var $orig = _vm.__get_orig(item)
+    var g0 = item.publishTime ? item.publishTime.split(" ") : null
+    return {
+      $orig: $orig,
+      g0: g0,
+    }
+  })
+  _vm.$mp.data = Object.assign(
+    {},
+    {
+      $root: {
+        l0: l0,
+      },
+    }
+  )
 }
 var recyclableRender = false
 var staticRenderFns = []
@@ -138,22 +154,13 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 /* WEBPACK VAR INJECTION */(function(uni) {
 
+var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ 4);
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 42));
+var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 44));
 //
 //
 //
@@ -185,19 +192,59 @@ exports.default = void 0;
 var _default = {
   data: function data() {
     return {
-      news: [{
-        title: '新的志愿者已加入平台',
-        time: '2023-10-15'
-      }, {
-        title: '本周将开展健康讲座',
-        time: '2023-10-14'
-      }, {
-        title: '系统更新维护通知',
-        time: '2023-10-13'
-      }]
+      news: []
     };
   },
+  onLoad: function onLoad() {
+    this.loadNews();
+  },
   methods: {
+    loadNews: function loadNews() {
+      var _this = this;
+      return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee() {
+        var res;
+        return _regenerator.default.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.prev = 0;
+                _context.next = 3;
+                return _this.$request.get('/news');
+              case 3:
+                res = _context.sent;
+                if (res.code === 200) {
+                  _this.news = res.data;
+                } else {
+                  // 如果接口失败，使用默认数据
+                  _this.news = [{
+                    title: '新的志愿者已加入平台',
+                    publishTime: '2023-10-15'
+                  }, {
+                    title: '系统更新维护通知',
+                    publishTime: '2023-10-13'
+                  }];
+                }
+                _context.next = 11;
+                break;
+              case 7:
+                _context.prev = 7;
+                _context.t0 = _context["catch"](0);
+                console.error('加载新闻失败:', _context.t0);
+                _this.news = [{
+                  title: '新的志愿者已加入平台',
+                  publishTime: '2023-10-15'
+                }, {
+                  title: '系统更新维护通知',
+                  publishTime: '2023-10-13'
+                }];
+              case 11:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, null, [[0, 7]]);
+      }))();
+    },
     goToService: function goToService(serviceType) {
       // 根据用户类型跳转到相应服务页面
       var userType = 'elder'; // 假设当前用户是老人

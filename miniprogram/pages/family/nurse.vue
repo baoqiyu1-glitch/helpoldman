@@ -1,19 +1,51 @@
 <template>
   <view class="nurse-container">
-    <view class="nurse-list">
-      <view class="nurse-item" v-for="nurse in nurseList" :key="nurse.id" @click="selectNurse(nurse)">
-        <image class="nurse-image" :src="nurse.image" mode="aspectFill"></image>
-        <view class="nurse-info">
-          <text class="nurse-name">{{ nurse.name }}</text>
-          <text class="nurse-level">{{ nurse.level }}</text>
-          <text class="nurse-desc">{{ nurse.description }}</text>
-          <view class="nurse-meta">
-            <text class="experience">工作经验：{{ nurse.experience }}</text>
-            <text class="price">¥{{ nurse.price }}/天</text>
-          </view>
-          <button class="book-btn" @click.stop="bookNurse(nurse)">立即预约</button>
+    <!-- 老人选择 -->
+    <view class="elder-selection" v-if="elders.length > 0">
+      <text class="section-title">选择服务对象</text>
+      <view class="elder-list">
+        <view class="elder-item" 
+              v-for="elder in elders" 
+              :key="elder.id"
+              :class="{ active: selectedElder && selectedElder.id === elder.id }"
+              @click="selectElder(elder)">
+          <text class="elder-name">{{ elder.name }}</text>
+          <text class="elder-relation">{{ elder.relation }}</text>
         </view>
       </view>
+    </view>
+
+    <!-- 护工服务申请表单 -->
+    <view class="service-form">
+      <text class="section-title">护工服务申请</text>
+      
+      <view class="form-item">
+        <text class="label">服务类型</text>
+        <picker @change="onServiceTypeChange" :value="serviceTypeIndex" :range="nurseTypes" range-key="name">
+          <view class="picker">{{ serviceData.serviceType || '请选择服务类型' }}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">服务时间</text>
+        <picker mode="date" @change="onDateChange">
+          <view class="picker">{{ serviceData.serviceTime || '请选择服务日期' }}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">服务时长</text>
+        <picker @change="onDurationChange" :value="durationIndex" :range="durationOptions">
+          <view class="picker">{{ serviceData.duration || '请选择服务时长' }}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">特殊要求</text>
+        <textarea v-model="serviceData.specialRequirements" placeholder="请输入特殊要求（可选）" style="height: 120rpx;"></textarea>
+      </view>
+      
+      <button type="primary" @click="submitApplication">提交申请</button>
     </view>
   </view>
 </template>
@@ -22,56 +54,115 @@
 export default {
   data() {
     return {
-      nurseList: [
-        { 
-          id: 1, 
-          name: '张护工', 
-          level: '高级护工', 
-          description: '10年护理经验，擅长老人日常护理、康复护理', 
-          experience: '10年', 
-          price: 200,
-          image: '../../static/images/nurse1.png'
-        },
-        { 
-          id: 2, 
-          name: '李护工', 
-          level: '中级护工', 
-          description: '5年护理经验，耐心细致，擅长与老人沟通', 
-          experience: '5年', 
-          price: 150,
-          image: '../../static/images/nurse2.png'
-        },
-        { 
-          id: 3, 
-          name: '王护工', 
-          level: '初级护工', 
-          description: '2年护理经验，认真负责，学习能力强', 
-          experience: '2年', 
-          price: 100,
-          image: '../../static/images/nurse3.png'
-        }
-      ]
+      elders: [],
+      selectedElder: null,
+      nurseTypes: [],
+      serviceTypeIndex: 0,
+      durationIndex: 0,
+      durationOptions: ['1小时', '2小时', '4小时', '8小时', '全天'],
+      serviceData: {
+        elderId: '',
+        serviceType: '',
+        serviceTime: '',
+        duration: '',
+        specialRequirements: ''
+      }
     }
   },
+  onLoad() {
+    this.loadElders()
+    this.loadNurseTypes()
+  },
   methods: {
-    selectNurse(nurse) {
-      // 查看护工详情
-      uni.navigateTo({
-        url: `/pages/family/nurse-detail?id=${nurse.id}`
-      })
-    },
-    bookNurse(nurse) {
-      uni.showModal({
-        title: '预约确认',
-        content: `确定要预约"${nurse.name}"护工吗？价格：¥${nurse.price}/天`,
-        success: (res) => {
-          if (res.confirm) {
-            uni.navigateTo({
-              url: `/pages/family/nurse-booking?id=${nurse.id}&name=${nurse.name}&price=${nurse.price}`
-            })
+    async loadElders() {
+      try {
+        const res = await this.$request.get('/family/elders')
+        if (res.code === 200) {
+          this.elders = res.data
+          if (this.elders.length > 0) {
+            this.selectElder(this.elders[0])
           }
         }
-      })
+      } catch (error) {
+        console.error('加载老人列表失败:', error)
+      }
+    },
+    
+    selectElder(elder) {
+      this.selectedElder = elder
+      this.serviceData.elderId = elder.id
+    },
+    
+    async loadNurseTypes() {
+      try {
+        const res = await this.$request.get('/nursing/types')
+        if (res.code === 200) {
+          this.nurseTypes = res.data
+        }
+      } catch (error) {
+        console.error('加载护工类型失败:', error)
+      }
+    },
+    
+    onServiceTypeChange(e) {
+      const index = e.detail.value
+      this.serviceTypeIndex = index
+      this.serviceData.serviceType = this.nurseTypes[index].name
+    },
+    
+    onDateChange(e) {
+      this.serviceData.serviceTime = e.detail.value
+    },
+    
+    onDurationChange(e) {
+      const index = e.detail.value
+      this.durationIndex = index
+      this.serviceData.duration = this.durationOptions[index]
+    },
+    
+    async submitApplication() {
+      if (!this.validateForm()) {
+        uni.showToast({ title: '请填写完整信息', icon: 'none' })
+        return
+      }
+      
+      if (!this.selectedElder) {
+        uni.showToast({ title: '请选择服务对象', icon: 'none' })
+        return
+      }
+      
+      try {
+        uni.showLoading({ title: '提交中...' })
+        // 使用家属端专用护工服务接口
+        const res = await this.$request.post('/family/apply-nursing', this.serviceData)
+        uni.hideLoading()
+        
+        if (res.code === 200) {
+          uni.showToast({ title: '申请提交成功' })
+          this.resetForm()
+        } else {
+          uni.showToast({ title: res.message || '申请失败', icon: 'none' })
+        }
+      } catch (error) {
+        uni.hideLoading()
+        uni.showToast({ title: '网络错误，请重试', icon: 'none' })
+      }
+    },
+    
+    validateForm() {
+      return this.serviceData.serviceType && this.serviceData.serviceTime && this.serviceData.duration
+    },
+    
+    resetForm() {
+      this.serviceData = {
+        elderId: this.selectedElder ? this.selectedElder.id : '',
+        serviceType: '',
+        serviceTime: '',
+        duration: '',
+        specialRequirements: ''
+      }
+      this.serviceTypeIndex = 0
+      this.durationIndex = 0
     }
   }
 }
@@ -84,71 +175,93 @@ export default {
   min-height: 100vh;
 }
 
-.nurse-list {
+.section-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  color: #333;
+}
+
+.elder-selection {
   background-color: #fff;
   border-radius: 10rpx;
-  overflow: hidden;
-}
-
-.nurse-item {
   padding: 20rpx;
-  border-bottom: 1rpx solid #eee;
-}
-
-.nurse-item:last-child {
-  border-bottom: none;
-}
-
-.nurse-image {
-  width: 100%;
-  height: 300rpx;
-  border-radius: 10rpx;
   margin-bottom: 20rpx;
 }
 
-.nurse-name {
-  display: block;
-  font-size: 36rpx;
-  font-weight: bold;
-  margin-bottom: 5rpx;
+.elder-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
 }
 
-.nurse-level {
-  display: block;
+.elder-item {
+  padding: 20rpx 30rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 10rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 150rpx;
+}
+
+.elder-item.active {
+  border-color: #007AFF;
+  background-color: #f0f8ff;
+}
+
+.elder-name {
   font-size: 28rpx;
-  color: #007AFF;
-  margin-bottom: 15rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
 }
 
-.nurse-desc {
+.elder-relation {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.service-form {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.label {
   display: block;
   font-size: 30rpx;
   color: #666;
-  margin-bottom: 20rpx;
-  line-height: 45rpx;
+  margin-bottom: 15rpx;
 }
 
-.nurse-meta {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20rpx;
-}
-
-.experience {
-  font-size: 28rpx;
-  color: #999;
-}
-
-.price {
-  font-size: 34rpx;
-  color: #FF4444;
-  font-weight: bold;
-}
-
-.book-btn {
+.picker {
   width: 100%;
-  height: 60rpx;
-  font-size: 28rpx;
+  padding: 20rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 5rpx;
+  font-size: 32rpx;
+  background-color: #f9f9f9;
+}
+
+textarea {
+  width: 100%;
+  padding: 20rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 5rpx;
+  font-size: 32rpx;
+  background-color: #f9f9f9;
+}
+
+button {
+  width: 100%;
+  height: 90rpx;
+  font-size: 34rpx;
+  border-radius: 10rpx;
   background-color: #007AFF;
   color: #fff;
 }

@@ -1,19 +1,38 @@
 <template>
   <view class="shopping-container">
+    <!-- 老人选择 -->
+    <view class="elder-selection" v-if="elders.length > 0">
+      <text class="section-title">选择老人</text>
+      <view class="elder-list">
+        <view class="elder-item" 
+              v-for="elder in elders" 
+              :key="elder.id"
+              :class="{ active: selectedElder && selectedElder.id === elder.id }"
+              @click="selectElder(elder)">
+          <text class="elder-name">{{ elder.name }}</text>
+          <text class="elder-relation">{{ elder.relation }}</text>
+        </view>
+      </view>
+    </view>
+
     <view class="search-bar">
       <input type="text" placeholder="搜索需要代购的商品" v-model="searchText" />
-      <button @click="search">搜索</button>
+      <button @click="searchProducts">搜索</button>
     </view>
     
     <view class="category-list">
-      <view class="category-item" v-for="category in categories" :key="category.id" @click="selectCategory(category)">
+      <view class="category-item" 
+            v-for="category in categories" 
+            :key="category.id" 
+            :class="{ active: selectedCategory && selectedCategory.id === category.id }"
+            @click="selectCategory(category)">
         <text>{{ category.name }}</text>
       </view>
     </view>
     
     <view class="product-list">
-      <view class="product-item" v-for="product in products" :key="product.id">
-        <image class="product-image" :src="product.image" mode="aspectFill"></image>
+      <view class="product-item" v-for="product in filteredProducts" :key="product.id">
+        <image class="product-image" :src="product.image || '/static/default-product.png'" mode="aspectFill"></image>
         <view class="product-info">
           <text class="product-name">{{ product.name }}</text>
           <text class="product-price">¥{{ product.price }}</text>
@@ -22,9 +41,9 @@
       </view>
     </view>
     
-    <view class="cart-bar" v-if="cartCount > 0">
-      <text class="cart-count">{{ cartCount }}</text>
-      <button type="primary" @click="goToCart">去结算</button>
+    <view class="cart-bar" v-if="cartItems.length > 0">
+      <text class="cart-count">{{ cartItems.length }}</text>
+      <button type="primary" @click="submitShoppingRequest">提交代购申请</button>
     </view>
   </view>
 </template>
@@ -33,41 +52,140 @@
 export default {
   data() {
     return {
+      elders: [],
+      selectedElder: null,
       searchText: '',
-      categories: [
-        { id: 1, name: '食品' },
-        { id: 2, name: '日用品' },
-        { id: 3, name: '药品' },
-        { id: 4, name: '其他' }
-      ],
-      products: [
-        { id: 1, name: '大米', price: 50, image: '../../static/images/rice.png', categoryId: 1 },
-        { id: 2, name: '面粉', price: 30, image: '../../static/images/flour.png', categoryId: 1 },
-        { id: 3, name: '食用油', price: 80, image: '../../static/images/oil.png', categoryId: 1 },
-        { id: 4, name: '洗发水', price: 45, image: '../../static/images/shampoo.png', categoryId: 2 },
-        { id: 5, name: '牙膏', price: 15, image: '../../static/images/toothpaste.png', categoryId: 2 }
-      ],
-      cartCount: 0
+      categories: [],
+      selectedCategory: null,
+      products: [],
+      cartItems: []
     }
   },
+  computed: {
+    filteredProducts() {
+      let filtered = this.products
+      
+      // 按分类筛选
+      if (this.selectedCategory) {
+        filtered = filtered.filter(product => product.categoryId === this.selectedCategory.id)
+      }
+      
+      // 按搜索关键词筛选
+      if (this.searchText) {
+        filtered = filtered.filter(product => 
+          product.name.toLowerCase().includes(this.searchText.toLowerCase())
+        )
+      }
+      
+      return filtered
+    }
+  },
+  onLoad() {
+    this.loadElders()
+    this.loadCategories()
+    this.loadProducts()
+  },
   methods: {
-    search() {
-      // 搜索商品
-      uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+    async loadElders() {
+      try {
+        const res = await this.$request.get('/family/elders')
+        if (res.code === 200) {
+          this.elders = res.data
+          if (this.elders.length > 0) {
+            this.selectElder(this.elders[0])
+          }
+        }
+      } catch (error) {
+        console.error('加载老人列表失败:', error)
+      }
     },
+    
+    async loadCategories() {
+      try {
+        const res = await this.$request.get('/product/categories')
+        if (res.code === 200) {
+          this.categories = res.data
+        }
+      } catch (error) {
+        console.error('加载商品分类失败:', error)
+      }
+    },
+    
+    async loadProducts() {
+      try {
+        const res = await this.$request.get('/products')
+        if (res.code === 200) {
+          this.products = res.data
+        }
+      } catch (error) {
+        console.error('加载商品列表失败:', error)
+      }
+    },
+    
+    selectElder(elder) {
+      this.selectedElder = elder
+    },
+    
     selectCategory(category) {
-      // 筛选商品
-      uni.showToast({ title: '分类功能开发中', icon: 'none' })
+      this.selectedCategory = this.selectedCategory && this.selectedCategory.id === category.id ? null : category
     },
+    
+    searchProducts() {
+      // 搜索逻辑已在computed中实现
+    },
+    
     addProduct(product) {
-      this.cartCount++
+      const existingItem = this.cartItems.find(item => item.id === product.id)
+      if (existingItem) {
+        existingItem.quantity++
+      } else {
+        this.cartItems.push({
+          ...product,
+          quantity: 1
+        })
+      }
       uni.showToast({ title: '已加入购物车', icon: 'success' })
     },
-    goToCart() {
-      // 跳转到购物车页面
-      uni.navigateTo({
-        url: '/pages/family/cart'
-      })
+    
+    async submitShoppingRequest() {
+      if (!this.selectedElder) {
+        uni.showToast({ title: '请选择老人', icon: 'none' })
+        return
+      }
+      
+      if (this.cartItems.length === 0) {
+        uni.showToast({ title: '请添加商品到购物车', icon: 'none' })
+        return
+      }
+      
+      const shoppingData = {
+        elderId: this.selectedElder.id,
+        items: this.cartItems,
+        totalAmount: this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0),
+        deliveryAddress: this.selectedElder.address || '默认地址'
+      }
+      
+      try {
+        uni.showLoading({ title: '提交代购申请中...' })
+        const res = await this.$request.post('/family/apply-service', {
+          ...shoppingData,
+          serviceType: 'shopping'  // 服务类型标识
+        })
+        uni.hideLoading()
+        
+        if (res.code === 200) {
+          uni.showToast({ title: '代购申请提交成功' })
+          this.cartItems = []
+          setTimeout(() => {
+            uni.navigateBack()
+          }, 1500)
+        } else {
+          uni.showToast({ title: res.message || '申请失败', icon: 'none' })
+        }
+      } catch (error) {
+        uni.hideLoading()
+        uni.showToast({ title: '网络错误，请重试', icon: 'none' })
+      }
     }
   }
 }
@@ -78,6 +196,53 @@ export default {
   padding: 20rpx;
   background-color: #f5f5f5;
   min-height: 100vh;
+}
+
+.section-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  color: #333;
+}
+
+.elder-selection {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.elder-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.elder-item {
+  padding: 20rpx 30rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 10rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 150rpx;
+}
+
+.elder-item.active {
+  border-color: #007AFF;
+  background-color: #f0f8ff;
+}
+
+.elder-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.elder-relation {
+  font-size: 24rpx;
+  color: #666;
 }
 
 .search-bar {
@@ -117,6 +282,11 @@ export default {
   background-color: #f0f0f0;
   border-radius: 20rpx;
   white-space: nowrap;
+}
+
+.category-item.active {
+  background-color: #007AFF;
+  color: #fff;
 }
 
 .product-list {

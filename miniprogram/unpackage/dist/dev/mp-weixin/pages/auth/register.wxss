@@ -38,7 +38,7 @@
   gap: 40rpx;
   padding: 20rpx 0;
 }
-.radio-group label.data-v-6e828681 {
+.radio-item.data-v-6e828681 {
   display: flex;
   align-items: center;
   gap: 10rpx;

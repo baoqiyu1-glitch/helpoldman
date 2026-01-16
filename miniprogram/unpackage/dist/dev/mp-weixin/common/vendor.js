@@ -11094,6 +11094,9 @@ var _default = {
     "pages/common/index": {
       "navigationBarTitleText": "首页"
     },
+    "pages/elder/index": {
+      "navigationBarTitleText": "老人服务"
+    },
     "pages/elder/personal": {
       "navigationBarTitleText": "个人中心"
     },
@@ -11133,6 +11136,9 @@ var _default = {
     "pages/family/meal": {
       "navigationBarTitleText": "送饭服务"
     },
+    "pages/family/index": {
+      "navigationBarTitleText": "家人首页"
+    },
     "pages/family/shopping": {
       "navigationBarTitleText": "代购物资"
     },
@@ -11141,6 +11147,16 @@ var _default = {
     },
     "pages/family/cooking": {
       "navigationBarTitleText": "做饭送饭"
+    },
+    "pages/common/services": {
+      "navigationBarTitleText": "服务"
+    },
+    "pages/common/message": {
+      "navigationBarTitleText": "消息"
+    },
+    "pages/volunteer/index": {
+      "navigationBarTitleText": "志愿者首页",
+      "enablePullDownRefresh": true
     },
     "pages/volunteer/apply": {
       "navigationBarTitleText": "志愿者申请"
@@ -11157,11 +11173,11 @@ var _default = {
     "pages/volunteer/training": {
       "navigationBarTitleText": "培训技能"
     },
-    "pages/common/services": {
-      "navigationBarTitleText": "服务"
+    "pages/volunteer/my-tasks": {
+      "navigationBarTitleText": "我的任务"
     },
-    "pages/common/message": {
-      "navigationBarTitleText": "消息"
+    "pages/volunteer/order-details": {
+      "navigationBarTitleText": "订单详情"
     }
   },
   "globalStyle": {
@@ -11422,7 +11438,7 @@ var Request = /*#__PURE__*/function () {
                 });
                 return _context.abrupt("return", Promise.reject(new Error(result.message || '操作失败')));
               case 24:
-                return _context.abrupt("return", result.data);
+                return _context.abrupt("return", result);
               case 27:
                 _context.prev = 27;
                 _context.t0 = _context["catch"](4);
@@ -11887,6 +11903,390 @@ module.exports = {
   appId: 'your-app-id',
   // 微信登录授权scope
   scope: 'scope.userInfo'
+};
+
+/***/ }),
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */,
+/* 71 */,
+/* 72 */,
+/* 73 */,
+/* 74 */,
+/* 75 */,
+/* 76 */
+/*!******************************************************!*\
+  !*** D:/毕业设计/源码/helpoldman/miniprogram/utils/api.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ 4);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.familyService = void 0;
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/defineProperty */ 11));
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+var request = __webpack_require__(/*! ./requset */ 41);
+
+// 护工服务API
+var nursingService = {
+  // 申请护工服务
+  applyService: function applyService(data) {
+    return request.post('/nursing-service/apply', data);
+  },
+  // 获取我的护工服务申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/nursing-service/my?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取所有护工服务申请（管理员）
+  getAllApplications: function getAllApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/nursing-service/all?page=".concat(page, "&size=").concat(size));
+  },
+  // 分配护工
+  assignNurse: function assignNurse(applicationId, nurseId) {
+    return request.put("/nursing-service/assign/".concat(applicationId), {
+      nurseId: nurseId
+    });
+  }
+};
+
+// 无障碍改造API
+var barrierFreeService = {
+  // 提交无障碍改造申请
+  applyRenovation: function applyRenovation(data) {
+    return request.post('/renovations', data);
+  },
+  // 获取我的改造申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/renovations/my?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取改造类型
+  getRenovationTypes: function getRenovationTypes() {
+    return request.get('/service-types?category=RENOVATION');
+  }
+};
+
+// 送饭服务API
+var mealDeliveryService = {
+  // 申请送饭服务
+  applyService: function applyService(data) {
+    return request.post('/meal-delivery/apply', data);
+  },
+  // 获取我的申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/meal-delivery/my?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取所有申请（管理员）
+  getAllApplications: function getAllApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/meal-delivery/all?page=".concat(page, "&size=").concat(size));
+  },
+  // 更新申请状态
+  updateStatus: function updateStatus(applicationId, status) {
+    return request.put("/meal-delivery/status/".concat(applicationId), {
+      status: status
+    });
+  }
+};
+
+// 补贴申请API
+var subsidyService = {
+  // 提交补贴申请
+  applySubsidy: function applySubsidy(data) {
+    return request.post('/subsidy-application/apply', data);
+  },
+  // 获取我的申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/subsidy-application/my?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取所有申请（管理员）
+  getAllApplications: function getAllApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/subsidy-application/all?page=".concat(page, "&size=").concat(size));
+  },
+  // 更新申请状态
+  updateStatus: function updateStatus(applicationId, status) {
+    return request.put("/subsidy-application/status/".concat(applicationId), {
+      status: status
+    });
+  }
+};
+
+// 捐赠管理API
+var donationService = {
+  // 提交捐赠申请
+  applyDonation: function applyDonation(data) {
+    return request.post('/donation/apply', data);
+  },
+  // 获取我的捐赠记录
+  getMyDonations: function getMyDonations() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/donation/my?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取所有捐赠记录（管理员）
+  getAllDonations: function getAllDonations() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/donation/all?page=".concat(page, "&size=").concat(size));
+  }
+};
+
+// 社区互助API
+var communityService = {
+  // 发布互助信息
+  publishHelp: function publishHelp(data) {
+    return request.post('/community-help', data);
+  },
+  // 获取我的互助信息
+  getMyHelps: function getMyHelps() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/community-help/my?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取所有互助信息
+  getAllHelps: function getAllHelps() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/community-help/requests?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取帮助提供列表
+  getHelpOffers: function getHelpOffers() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/community-help/offers?page=".concat(page, "&size=").concat(size));
+  },
+  // 响应互助请求
+  respondHelp: function respondHelp(helpId) {
+    return request.put("/community-help/".concat(helpId, "/help"));
+  }
+};
+
+// 紧急报警API
+var emergencyService = {
+  // 提交紧急报警
+  submitAlert: function submitAlert(data) {
+    return request.post('/emergency-alerts', data);
+  },
+  // 获取我的报警记录
+  getMyAlerts: function getMyAlerts() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/emergency-alerts/my?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取所有报警记录（管理员）
+  getAllAlerts: function getAllAlerts() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/emergency-alerts/all?page=".concat(page, "&size=").concat(size));
+  },
+  // 获取报警统计
+  getAlertStats: function getAlertStats() {
+    return request.get('/emergency-alerts/stats');
+  }
+};
+
+// 家政服务API（保留这个完整版本，删除下面的简化版本）
+var houseworkService = {
+  // 获取服务类型
+  getServiceTypes: function getServiceTypes() {
+    return request.get('/service-types?type=HOUSEWORK');
+  },
+  // 申请家政服务
+  applyService: function applyService(data) {
+    return request.post('/service-orders', _objectSpread(_objectSpread({}, data), {}, {
+      serviceTypeId: 2 // 家政服务类型ID（正确）
+    }));
+  },
+  // 获取我的家政服务申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/service-orders/my?serviceType=HOUSEWORK&page=".concat(page, "&size=").concat(size));
+  }
+};
+
+// 设备租赁API
+var equipmentService = {
+  // 获取服务类型
+  getServiceTypes: function getServiceTypes() {
+    return request.get('/service-types?type=EQUIPMENT');
+  },
+  // 申请设备租赁
+  applyService: function applyService(data) {
+    return request.post('/service-orders', _objectSpread(_objectSpread({}, data), {}, {
+      serviceTypeId: 3 // 设备租赁类型ID（正确）
+    }));
+  },
+  // 获取我的设备租赁申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/service-orders/my?serviceType=EQUIPMENT&page=".concat(page, "&size=").concat(size));
+  }
+};
+
+// 培训服务API
+var trainingService = {
+  // 获取服务类型
+  getServiceTypes: function getServiceTypes() {
+    return request.get('/service-types?type=TRAINING');
+  },
+  // 申请培训服务
+  applyService: function applyService(data) {
+    return request.post('/service-orders', _objectSpread(_objectSpread({}, data), {}, {
+      serviceTypeId: 5 // 修正：培训服务类型ID应为5（之前是4）
+    }));
+  },
+  // 获取我的培训服务申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/service-orders/my?serviceType=TRAINING&page=".concat(page, "&size=").concat(size));
+  }
+};
+
+// 代购服务API
+var shoppingService = {
+  // 申请代购服务
+  applyService: function applyService(data) {
+    return request.post('/service-orders', {
+      serviceTypeId: 1,
+      // 代购服务类型ID（正确）
+      serviceContent: data.content || data.description,
+      appointmentTime: data.appointmentTime || new Date(),
+      address: data.address,
+      contactPhone: data.contactPhone
+    });
+  },
+  // 获取我的代购服务申请
+  getMyApplications: function getMyApplications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/service-orders/my?serviceType=PURCHASE&page=".concat(page, "&size=").concat(size));
+  }
+};
+
+// 删除重复的家政服务API定义（第220-230行的简化版本）
+
+// 商品相关API
+var productApi = {
+  // 获取所有商品分类
+  getCategories: function getCategories() {
+    return request.get('/product-categories');
+  },
+  // 获取商品列表
+  getProducts: function getProducts() {
+    var categoryId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    var params = categoryId ? "?categoryId=".concat(categoryId) : '';
+    return request.get("/products".concat(params));
+  },
+  // 根据分类获取商品
+  getProductsByCategory: function getProductsByCategory(categoryId) {
+    return request.get("/products/category/".concat(categoryId));
+  },
+  // 搜索商品
+  searchProducts: function searchProducts(keyword) {
+    return request.get("/products/search?keyword=".concat(encodeURIComponent(keyword)));
+  }
+};
+
+// 通用服务API
+var serviceApi = {
+  // 获取所有服务类型
+  getServiceTypes: function getServiceTypes() {
+    return request.get('/service-types');
+  },
+  // 获取用户信息
+  getUserInfo: function getUserInfo() {
+    return request.get('/auth/current');
+  },
+  // 获取通知公告
+  getNotifications: function getNotifications() {
+    var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+    return request.get("/notifications?page=".concat(page, "&size=").concat(size));
+  }
+};
+
+// 在api.js中增加家属端服务
+var familyService = {
+  // 获取家属信息
+  getFamilyInfo: function getFamilyInfo() {
+    return request.get('/family/info');
+  },
+  // 获取家属照顾的老人
+  getFamilyElders: function getFamilyElders() {
+    return request.get('/family/elders');
+  },
+  // 家属申请服务
+  applyService: function applyService(serviceData) {
+    return request.post('/family/apply-service', serviceData);
+  },
+  // 获取服务记录
+  getServiceRecords: function getServiceRecords(params) {
+    return request.get('/family/service-records', {
+      params: params
+    });
+  }
+};
+
+// 导出家属服务
+exports.familyService = familyService;
+module.exports = {
+  nursingService: nursingService,
+  barrierFreeService: barrierFreeService,
+  mealDeliveryService: mealDeliveryService,
+  subsidyService: subsidyService,
+  donationService: donationService,
+  communityService: communityService,
+  emergencyService: emergencyService,
+  houseworkService: houseworkService,
+  equipmentService: equipmentService,
+  trainingService: trainingService,
+  shoppingService: shoppingService,
+  productApi: productApi,
+  serviceApi: serviceApi
 };
 
 /***/ })

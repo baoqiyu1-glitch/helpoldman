@@ -4,10 +4,34 @@
   background-color: #f5f5f5;
   min-height: 100vh;
 }
+.loading.data-v-e8ea4b10, .error.data-v-e8ea4b10 {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 32rpx;
+  color: #666;
+}
+.error.data-v-e8ea4b10 {
+  color: #ff4444;
+}
+.page-header.data-v-e8ea4b10 {
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+.title.data-v-e8ea4b10 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
 .training-list.data-v-e8ea4b10 {
   background-color: #fff;
   border-radius: 10rpx;
   overflow: hidden;
+}
+.no-courses.data-v-e8ea4b10 {
+  text-align: center;
+  padding: 60rpx 20rpx;
+  font-size: 32rpx;
+  color: #999;
 }
 .training-item.data-v-e8ea4b10 {
   padding: 20rpx;
@@ -16,50 +40,76 @@
 .training-item.data-v-e8ea4b10:last-child {
   border-bottom: none;
 }
-.training-image.data-v-e8ea4b10 {
-  width: 100%;
-  height: 250rpx;
-  border-radius: 10rpx;
-  margin-bottom: 20rpx;
+.course-header.data-v-e8ea4b10 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
 }
-.training-title.data-v-e8ea4b10 {
-  display: block;
-  font-size: 36rpx;
+.course-title.data-v-e8ea4b10 {
+  font-size: 34rpx;
   font-weight: bold;
-  margin-bottom: 10rpx;
   color: #333;
+  flex: 1;
 }
-.training-desc.data-v-e8ea4b10 {
-  display: block;
+.course-status.data-v-e8ea4b10 {
+  font-size: 28rpx;
+  padding: 5rpx 15rpx;
+  border-radius: 15rpx;
+}
+.course-status.ongoing.data-v-e8ea4b10 {
+  background-color: #cce7ff;
+  color: #007AFF;
+}
+.course-status.upcoming.data-v-e8ea4b10 {
+  background-color: #e6f7ff;
+  color: #52c41a;
+}
+.course-status.completed.data-v-e8ea4b10 {
+  background-color: #f5f5f5;
+  color: #999;
+}
+.course-info.data-v-e8ea4b10 {
+  margin-bottom: 15rpx;
+}
+.course-desc.data-v-e8ea4b10 {
   font-size: 30rpx;
   color: #666;
-  margin-bottom: 20rpx;
   line-height: 1.5;
 }
-.training-meta.data-v-e8ea4b10 {
+.course-meta.data-v-e8ea4b10 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+.course-details.data-v-e8ea4b10 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+.course-capacity.data-v-e8ea4b10 {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15rpx;
   font-size: 28rpx;
-  color: #999;
-}
-.trainer.data-v-e8ea4b10 {
-  display: block;
-  font-size: 30rpx;
   color: #666;
-  margin-bottom: 20rpx;
 }
-.training-actions.data-v-e8ea4b10 {
+.course-actions.data-v-e8ea4b10 {
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-.apply-btn.data-v-e8ea4b10 {
+.register-btn.data-v-e8ea4b10 {
   width: 200rpx;
   height: 60rpx;
   font-size: 28rpx;
   background-color: #007AFF;
   color: #fff;
+  border-radius: 10rpx;
 }
 .status-text.data-v-e8ea4b10 {
   font-size: 30rpx;
@@ -72,10 +122,10 @@
 }
 .status-text.upcoming.data-v-e8ea4b10 {
   background-color: #e6f7ff;
-  color: #00bfff;
+  color: #52c41a;
 }
 .status-text.completed.data-v-e8ea4b10 {
-  background-color: #d4edda;
-  color: #28a745;
+  background-color: #f5f5f5;
+  color: #999;
 }
 

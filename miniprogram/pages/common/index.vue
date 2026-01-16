@@ -5,24 +5,12 @@
     </view>
     
     <view class="service-grid">
-      <view class="service-item" @click="goToService('shopping')">
-        <view class="service-icon">🛒</view>
-        <text class="service-name">代购生活物资</text>
-      </view>
-      
-      <view class="service-item" @click="goToService('housework')">
-        <view class="service-icon">🧹</view>
-        <text class="service-name">上门协助家务</text>
-      </view>
-      
-      <view class="service-item" @click="goToService('emergency')">
-        <view class="service-icon">🚨</view>
-        <text class="service-name">紧急报警</text>
-      </view>
-      
-      <view class="service-item" @click="goToService('training')">
-        <view class="service-icon">📚</view>
-        <text class="service-name">技能培训</text>
+      <view class="service-item" 
+            v-for="service in mainServices" 
+            :key="service.id"
+            @click="goToService(service.code)">
+        <view class="service-icon">{{ service.icon }}</view>
+        <text class="service-name">{{ service.name }}</text>
       </view>
     </view>
     
@@ -31,7 +19,7 @@
       <view class="news-list">
         <view class="news-item" v-for="(item, index) in news" :key="index">
           <text class="news-title">{{ item.title }}</text>
-          <text class="news-time">{{ item.time }}</text>
+          <text class="news-time">{{ item.publishTime ? item.publishTime.split(' ')[0] : item.time }}</text>
         </view>
       </view>
     </view>
@@ -42,14 +30,34 @@
 export default {
   data() {
     return {
-      news: [
-        { title: '新的志愿者已加入平台', time: '2023-10-15' },
-        { title: '本周将开展健康讲座', time: '2023-10-14' },
-        { title: '系统更新维护通知', time: '2023-10-13' }
-      ]
+      news: []
     }
   },
+  onLoad() {
+    this.loadNews();
+  },
   methods: {
+    async loadNews() {
+      try {
+        const res = await this.$request.get('/news');
+        if (res.code === 200) {
+          this.news = res.data;
+        } else {
+          // 如果接口失败，使用默认数据
+          this.news = [
+            { title: '新的志愿者已加入平台', publishTime: '2023-10-15' },
+            { title: '系统更新维护通知', publishTime: '2023-10-13' }
+          ];
+        }
+      } catch (error) {
+        console.error('加载新闻失败:', error);
+        this.news = [
+          { title: '新的志愿者已加入平台', publishTime: '2023-10-15' },
+          { title: '系统更新维护通知', publishTime: '2023-10-13' }
+        ];
+      }
+    },
+    
     goToService(serviceType) {
       // 根据用户类型跳转到相应服务页面
       const userType = 'elder' // 假设当前用户是老人

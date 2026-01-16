@@ -24,10 +24,13 @@ public class JwtUtil {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
         
+        // 修复：统一用户类型为大写，确保与数据库一致
+        String normalizedRole = role != null ? role.toUpperCase() : "ELDER";
+        
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("username", username)
-                .claim("role", role)
+                .claim("role", normalizedRole)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, secret)

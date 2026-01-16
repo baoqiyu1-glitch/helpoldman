@@ -1,0 +1,339 @@
+
+.volunteer-container {
+  padding: 30rpx 30rpx 130rpx 30rpx; /* 增加底部内边距，避免内容被底部导航遮挡 */
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 用户信息区域 */
+.user-info-section {
+  background: linear-gradient(135deg, #007AFF, #5AC8FA);
+  border-radius: 20rpx;
+  padding: 40rpx;
+  color: white;
+  margin-bottom: 30rpx;
+  display: flex;
+  align-items: center;
+}
+.user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+.user-avatar image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+.username {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+.user-role {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+/* 服务统计区域 */
+.stats-section {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30rpx;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.stat-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+/* 快速服务入口 */
+.quick-services-section {
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  min-height: 300rpx; /* 确保有足够高度 */
+}
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  color: #333;
+}
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30rpx;
+}
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx;
+  background-color: #f8f8f8;
+  border-radius: 15rpx;
+  border: 1rpx solid #e0e0e0;
+  min-height: 120rpx; /* 确保服务项有足够高度 */
+  justify-content: center; /* 垂直居中 */
+}
+.service-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 15rpx;
+  display: block; /* 确保图片显示 */
+}
+.service-name {
+  font-size: 28rpx;
+  color: #333;
+  text-align: center;
+  font-weight: 500; /* 增加字体粗细 */
+}
+.no-services {
+  text-align: center;
+  padding: 20rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 最近任务 */
+.recent-tasks-section {
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+}
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  border-radius: 10rpx;
+}
+.task-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.task-title {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+.task-type, .task-date {
+  font-size: 24rpx;
+  color: #666;
+}
+.task-status {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  white-space: nowrap;
+}
+.status-pending {
+  background-color: #FF9500;
+  color: white;
+}
+.status-in-progress {
+  background-color: #007AFF;
+  color: white;
+}
+.status-completed {
+  background-color: #4CD964;
+  color: white;
+}
+
+/* 自定义底部导航 */
+.custom-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100rpx;
+  background-color: #FFFFFF;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1rpx solid #eeeeee;
+  z-index: 999;
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+.tab-item.active {
+  color: #007AFF;
+}
+.tab-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-bottom: 8rpx;
+}
+.tab-text {
+  font-size: 20rpx;
+}
+
+/* 培训课程区域 */
+.training-courses-section {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.view-all {
+  color: #007AFF;
+  font-size: 28rpx;
+}
+.courses-list {
+  margin-top: 20rpx;
+}
+.course-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.course-item:last-child {
+  border-bottom: none;
+}
+.course-info {
+  flex: 1;
+}
+.course-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+  display: block;
+}
+.course-details {
+  margin-bottom: 10rpx;
+}
+.course-instructor, .course-duration {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 5rpx;
+}
+.course-stats {
+  display: flex;
+  gap: 20rpx;
+}
+.registered-count, .course-capacity {
+  font-size: 24rpx;
+  color: #999;
+}
+.register-btn {
+  background: #007AFF;
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  padding: 10rpx 20rpx;
+  font-size: 24rpx;
+  min-width: 100rpx;
+}
+.no-courses {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  padding: 100rpx;
+}
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 8rpx solid #f3f3f3;
+  border-top: 8rpx solid #007AFF;
+  border-radius: 50%;
+  -webkit-animation: spin 1s linear infinite;
+          animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
+}
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}
+@-webkit-keyframes spin {
+0% { -webkit-transform: rotate(0deg); transform: rotate(0deg);
+}
+100% { -webkit-transform: rotate(360deg); transform: rotate(360deg);
+}
+}
+@keyframes spin {
+0% { -webkit-transform: rotate(0deg); transform: rotate(0deg);
+}
+100% { -webkit-transform: rotate(360deg); transform: rotate(360deg);
+}
+}
+
+/* 错误状态样式 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  padding: 100rpx;
+}
+.error-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 30rpx;
+}
+.error-text {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+.retry-button {
+  background-color: #007AFF;
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+}
+.retry-button:active {
+  background-color: #0056CC;
+}
+

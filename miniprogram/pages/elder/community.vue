@@ -1,49 +1,70 @@
 <template>
   <view class="community-container">
-    <view class="tab-bar">
-      <view class="tab-item" :class="{ active: activeTab === 0 }" @click="switchTab(0)">互助求助</view>
-      <view class="tab-item" :class="{ active: activeTab === 1 }" @click="switchTab(1)">互助帮助</view>
-    </view>
-    
-    <view class="content" v-if="activeTab === 0">
-      <button class="publish-btn" @click="publishHelp">发布求助</button>
+    <!-- 发布互助信息 -->
+    <view class="publish-form" v-if="showPublishForm">
+      <view class="form-item">
+        <text class="label">互助类型</text>
+        <picker @change="onTypeChange" :value="typeIndex" :range="typeOptions">
+          <view class="picker">{{ typeOptions[typeIndex] || '请选择互助类型' }}</view>
+        </picker>
+      </view>
       
-      <view class="help-list">
-        <view class="help-item" v-for="help in helpList" :key="help.id">
-          <view class="help-header">
-            <image class="avatar" :src="help.avatar" mode="aspectFill"></image>
-            <view class="user-info">
-              <text class="username">{{ help.username }}</text>
-              <text class="time">{{ help.time }}</text>
-            </view>
-          </view>
-          <view class="help-content">
-            <text class="title">{{ help.title }}</text>
-            <text class="desc">{{ help.description }}</text>
-          </view>
-          <view class="help-footer">
-            <text class="status">{{ help.status }}</text>
-            <button class="help-btn" @click="offerHelp(help)">我来帮忙</button>
-          </view>
-        </view>
+      <view class="form-item">
+        <text class="label">标题</text>
+        <input type="text" v-model="publishData.title" placeholder="请输入互助标题" />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">详细描述</text>
+        <textarea v-model="publishData.content" placeholder="请详细描述需要帮助的内容" style="height: 120rpx;"></textarea>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">期望帮助时间</text>
+        <picker mode="date" :value="publishData.expectedTime" @change="onDateChange">
+          <view class="picker">{{ publishData.expectedTime || '请选择期望时间' }}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">联系方式</text>
+        <input type="text" v-model="publishData.contact" placeholder="请输入联系电话" />
+      </view>
+      
+      <view class="form-actions">
+        <button class="btn-cancel" @click="showPublishForm = false">取消</button>
+        <button class="btn-submit" @click="publishHelp">发布</button>
       </view>
     </view>
     
-    <view class="content" v-if="activeTab === 1">
-      <view class="offer-list">
-        <view class="offer-item" v-for="offer in offerList" :key="offer.id">
-          <view class="offer-header">
-            <image class="avatar" :src="offer.avatar" mode="aspectFill"></image>
-            <view class="user-info">
-              <text class="username">{{ offer.username }}</text>
-              <text class="skill">{{ offer.skill }}</text>
-            </view>
+    <!-- 互助信息列表 -->
+    <view class="help-list" v-else>
+      <view class="section-header">
+        <text class="title">社区互助</text>
+        <button class="btn-new" @click="showPublishForm = true">+ 发布求助</button>
+      </view>
+      
+      <view class="help-items">
+        <view class="help-item" v-for="item in helpList" :key="item.id">
+          <view class="help-header">
+            <text class="type">{{ getTypeText(item.helpType) }}</text>
+            <text class="status" :class="item.statusClass">{{ getStatusText(item.status) }}</text>
           </view>
-          <view class="offer-content">
-            <text class="desc">{{ offer.description }}</text>
-            <text class="available-time">可提供帮助时间：{{ offer.availableTime }}</text>
+          <text class="title">{{ item.title }}</text>
+          <text class="content">{{ item.content }}</text>
+          <view class="help-footer">
+            <text class="author">{{ item.createBy }}</text>
+            <text class="time">{{ formatDate(item.createTime) }}</text>
+            <button class="btn-respond" v-if="item.status === 'PENDING'" @click="respondHelp(item.id)">响应帮助</button>
           </view>
-          <button class="contact-btn" @click="contactVolunteer(offer)">联系TA</button>
+        </view>
+        
+        <view class="load-more" v-if="hasMore" @click="loadMore">
+          <text>加载更多</text>
+        </view>
+        
+        <view class="empty" v-if="helpList.length === 0">
+          <text>暂无互助信息</text>
         </view>
       </view>
     </view>
@@ -51,74 +72,152 @@
 </template>
 
 <script>
+import { communityService } from '../../utils/api'
+
 export default {
   data() {
     return {
-      activeTab: 0,
-      helpList: [
-        { 
-          id: 1, 
-          username: '王奶奶', 
-          avatar: '../../static/images/avatar1.png', 
-          time: '2小时前', 
-          title: '需要帮忙买菜', 
-          description: '需要有人帮忙购买一些蔬菜和水果，送到家里', 
-          status: '待帮助'
-        },
-        { 
-          id: 2, 
-          username: '李爷爷', 
-          avatar: '../../static/images/avatar2.png', 
-          time: '5小时前', 
-          title: '需要帮忙修电视', 
-          description: '家里电视坏了，需要有人帮忙修理', 
-          status: '已有人帮忙'
-        }
-      ],
-      offerList: [
-        { 
-          id: 1, 
-          username: '张志愿者', 
-          avatar: '../../static/images/avatar3.png', 
-          skill: '家电维修', 
-          description: '擅长修理各种家用电器，免费为老人服务', 
-          availableTime: '周一至周五 下午'
-        },
-        { 
-          id: 2, 
-          username: '刘志愿者', 
-          avatar: '../../static/images/avatar4.png', 
-          skill: '代购服务', 
-          description: '可以帮忙购买生活用品，送到老人家中', 
-          availableTime: '周末全天'
-        }
-      ]
+      showPublishForm: false,
+      typeIndex: 0,
+      typeOptions: ['生活照料', '医疗陪护', '心理疏导', '物品代购', '其他帮助'],
+      publishData: {
+        helpType: '',
+        title: '',
+        content: '',
+        expectedTime: '',
+        contact: ''
+      },
+      helpList: [],
+      currentPage: 1,
+      pageSize: 10,
+      hasMore: true,
+      loading: false
     }
   },
+  
+  onLoad() {
+    this.loadHelpList()
+  },
+  
   methods: {
-    switchTab(tab) {
-      this.activeTab = tab
+    onTypeChange(e) {
+      this.typeIndex = e.detail.value
+      this.publishData.helpType = this.typeOptions[this.typeIndex]
     },
-    publishHelp() {
-      uni.navigateTo({
-        url: '/pages/elder/publish-help'
-      })
+    
+    onDateChange(e) {
+      this.publishData.expectedTime = e.detail.value
     },
-    offerHelp(help) {
-      uni.showModal({
-        title: '提供帮助',
-        content: `确定要帮助"${help.username}"吗？`,
-        success: (res) => {
-          if (res.confirm) {
-            uni.showToast({ title: '已成功提供帮助' })
-          }
+    
+    async publishHelp() {
+      if (!this.validateForm()) {
+        uni.showToast({ title: '请填写完整信息', icon: 'none' })
+        return
+      }
+      
+      try {
+        uni.showLoading({ title: '发布中...' })
+        await communityService.publishHelp(this.publishData)
+        uni.showToast({ title: '发布成功' })
+        this.showPublishForm = false
+        this.resetForm()
+        this.loadHelpList()
+      } catch (error) {
+        console.error('发布失败:', error)
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    
+    async respondHelp(helpId) {
+      try {
+        uni.showLoading({ title: '响应中...' })
+        await communityService.respondHelp(helpId)
+        uni.showToast({ title: '响应成功' })
+        this.loadHelpList()
+      } catch (error) {
+        console.error('响应失败:', error)
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    
+    validateForm() {
+      return this.publishData.helpType && 
+             this.publishData.title && 
+             this.publishData.content && 
+             this.publishData.expectedTime && 
+             this.publishData.contact
+    },
+    
+    resetForm() {
+      this.publishData = {
+        helpType: '',
+        title: '',
+        content: '',
+        expectedTime: '',
+        contact: ''
+      }
+      this.typeIndex = 0
+    },
+    
+    async loadHelpList() {
+      if (this.loading) return
+      
+      this.loading = true
+      try {
+        const result = await communityService.getAllHelps(this.currentPage, this.pageSize)
+        // 处理互助信息数据，添加状态类名
+        const processedRecords = (result.records || []).map(item => ({
+          ...item,
+          statusClass: this.getStatusClass(item.status)
+        }))
+        
+        if (this.currentPage === 1) {
+          this.helpList = processedRecords
+        } else {
+          this.helpList = [...this.helpList, ...processedRecords]
         }
-      })
+        this.hasMore = result.current < result.pages
+      } catch (error) {
+        console.error('加载互助信息失败:', error)
+      } finally {
+        this.loading = false
+      }
     },
-    contactVolunteer(offer) {
-      uni.makePhoneCall({
-        phoneNumber: '13800138000' // 这里替换为实际电话号码
-      })
+    
+    loadMore() {
+      if (this.hasMore && !this.loading) {
+        this.currentPage++
+        this.loadHelpList()
+      }
+    },
+    
+    getStatusText(status) {
+      const statusMap = {
+        'PENDING': '待帮助',
+        'RESPONDED': '已响应',
+        'COMPLETED': '已完成'
+      }
+      return statusMap[status] || '未知状态'
+    },
+    
+    getStatusClass(status) {
+      const classMap = {
+        'PENDING': 'status-pending',
+        'RESPONDED': 'status-responded',
+        'COMPLETED': 'status-completed'
+      }
+      return classMap[status] || 'status-pending'
+    },
+    
+    getTypeText(type) {
+      return type || '未知类型'
+    },
+    
+    formatDate(dateString) {
+      if (!dateString) return ''
+      return new Date(dateString).toLocaleDateString()
     }
   }
 }
@@ -126,111 +225,145 @@ export default {
 
 <style scoped>
 .community-container {
+  padding: 20rpx;
   background-color: #f5f5f5;
   min-height: 100vh;
 }
 
-.tab-bar {
-  display: flex;
+.publish-form {
   background-color: #fff;
-  border-bottom: 1rpx solid #eee;
-}
-
-.tab-item {
-  flex: 1;
-  text-align: center;
-  padding: 30rpx 0;
-  font-size: 32rpx;
-  color: #666;
-  border-bottom: 4rpx solid transparent;
-}
-
-.tab-item.active {
-  color: #007AFF;
-  border-bottom-color: #007AFF;
-}
-
-.content {
+  border-radius: 10rpx;
   padding: 20rpx;
 }
 
-.publish-btn {
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.label {
+  display: block;
+  font-size: 30rpx;
+  color: #666;
+  margin-bottom: 15rpx;
+}
+
+textarea, input, .picker {
   width: 100%;
-  height: 80rpx;
+  padding: 20rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 5rpx;
   font-size: 32rpx;
+  background-color: #f9f9f9;
+}
+
+.form-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn-cancel, .btn-submit {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 10rpx;
+  font-size: 32rpx;
+}
+
+.btn-cancel {
+  background-color: #999;
+  color: #fff;
+}
+
+.btn-submit {
   background-color: #007AFF;
   color: #fff;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20rpx;
 }
 
-.help-list, .offer-list {
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.btn-new {
+  background-color: #007AFF;
+  color: #fff;
+  font-size: 28rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.help-items {
   background-color: #fff;
   border-radius: 10rpx;
   overflow: hidden;
 }
 
-.help-item, .offer-item {
+.help-item {
   padding: 20rpx;
   border-bottom: 1rpx solid #eee;
 }
 
-.help-item:last-child, .offer-item:last-child {
+.help-item:last-child {
   border-bottom: none;
 }
 
-.help-header, .offer-header {
+.help-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 15rpx;
 }
 
-.avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  margin-right: 20rpx;
+.type {
+  font-size: 28rpx;
+  color: #007AFF;
+  background-color: #E3F2FD;
+  padding: 5rpx 15rpx;
+  border-radius: 15rpx;
 }
 
-.user-info {
-  flex: 1;
-}
-
-.username {
-  display: block;
-  font-size: 32rpx;
+.status {
+  font-size: 28rpx;
   font-weight: bold;
-  margin-bottom: 5rpx;
+  padding: 5rpx 15rpx;
+  border-radius: 15rpx;
 }
 
-.time, .skill {
-  display: block;
-  font-size: 26rpx;
-  color: #999;
+.status-pending {
+  background-color: #FFF3CD;
+  color: #856404;
 }
 
-.help-content, .offer-content {
-  margin-bottom: 20rpx;
+.status-responded {
+  background-color: #D1ECF1;
+  color: #0C5460;
+}
+
+.status-completed {
+  background-color: #D4EDDA;
+  color: #155724;
 }
 
 .title {
   display: block;
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: bold;
+  color: #333;
   margin-bottom: 10rpx;
 }
 
-.desc {
+.content {
   display: block;
   font-size: 30rpx;
   color: #666;
   line-height: 45rpx;
-}
-
-.available-time {
-  display: block;
-  font-size: 28rpx;
-  color: #999;
-  margin-top: 10rpx;
+  margin-bottom: 15rpx;
 }
 
 .help-footer {
@@ -239,19 +372,29 @@ export default {
   align-items: center;
 }
 
-.status {
-  padding: 5rpx 15rpx;
-  background-color: #f0f0f0;
-  border-radius: 15rpx;
+.author, .time {
   font-size: 26rpx;
-  color: #666;
+  color: #999;
 }
 
-.help-btn, .contact-btn {
-  width: 150rpx;
-  height: 60rpx;
-  font-size: 28rpx;
-  background-color: #007AFF;
+.btn-respond {
+  background-color: #28A745;
   color: #fff;
+  font-size: 26rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 15rpx;
+}
+
+.load-more {
+  text-align: center;
+  padding: 30rpx;
+  color: #007AFF;
+}
+
+.empty {
+  text-align: center;
+  padding: 60rpx;
+  color: #999;
+  font-size: 30rpx;
 }
 </style>

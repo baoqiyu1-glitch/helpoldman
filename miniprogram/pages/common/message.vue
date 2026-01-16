@@ -24,7 +24,87 @@
 export default {
   data() {
     return {
-      messages: [
+      messages: []
+    }
+  },
+  onLoad() {
+    this.loadMessages()
+  },
+  methods: {
+    async loadMessages() {
+      try {
+        const result = await this.$request.get('/messages')
+        // 将后端数据映射到前端格式
+        this.messages = this.mapMessages(result || [])
+      } catch (error) {
+        console.error('获取消息列表失败:', error)
+        uni.showToast({
+          title: '获取消息列表失败',
+          icon: 'none'
+        })
+        
+        // 失败时使用默认消息
+        this.useDefaultMessages()
+      }
+    },
+    
+    // 将后端消息数据映射到前端格式
+    mapMessages(backendMessages) {
+      return backendMessages.map(message => {
+        // 根据消息类型设置图标
+        let icon = "📢" // 默认系统通知图标
+        switch(message.type) {
+          case 'VOLUNTEER':
+            icon = "👥"
+            break
+          case 'TRAINING':
+            icon = "📅"
+            break
+          case 'SYSTEM':
+          default:
+            icon = "📢"
+            break
+        }
+        
+        // 格式化时间
+        const time = this.formatTime(message.createTime)
+        
+        return {
+          id: message.id,
+          icon: icon,
+          title: message.title,
+          desc: message.description || message.content,
+          time: time,
+          unread: message.isRead ? 0 : 1
+        }
+      })
+    },
+    
+    // 格式化时间
+    formatTime(timestamp) {
+      if (!timestamp) return '未知时间'
+      
+      const date = new Date(timestamp)
+      const now = new Date()
+      const diff = now - date
+      
+      // 计算时间差
+      const minutes = Math.floor(diff / 60000)
+      const hours = Math.floor(diff / 3600000)
+      const days = Math.floor(diff / 86400000)
+      
+      if (minutes < 1) return '刚刚'
+      if (minutes < 60) return `${minutes}分钟前`
+      if (hours < 24) return `${hours}小时前`
+      if (days < 7) return `${days}天前`
+      
+      // 超过一周显示具体日期
+      return `${date.getMonth() + 1}月${date.getDate()}日`
+    },
+    
+    // 使用默认消息（当接口调用失败时）
+    useDefaultMessages() {
+      this.messages = [
         {
           icon: "📢",
           title: "系统通知",
@@ -54,12 +134,17 @@ export default {
           unread: 0
         }
       ]
-    }
-  },
-  methods: {
+    },
+    
     readMessage(index) {
       // 标记消息为已读
       this.messages[index].unread = 0
+      // 调用接口更新消息状态
+      try {
+        this.$request.put(`/messages/${this.messages[index].id}/read`)
+      } catch (error) {
+        console.error('更新消息状态失败:', error)
+      }
     }
   }
 }

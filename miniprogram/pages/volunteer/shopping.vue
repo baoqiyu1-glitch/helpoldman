@@ -1,24 +1,24 @@
 <template>
   <view class="shopping-container">
     <view class="search-bar">
-      <input type="text" placeholder="搜索需要代购的商品" v-model="searchText" />
-      <button @click="search">搜索</button>
+      <input type="text" :placeholder="textConfig.searchPlaceholder || '搜索需要代购的商品'" v-model="searchText" />
+      <button @click="search">{{ textConfig.searchButton || '搜索' }}</button>
     </view>
     
     <view class="order-list">
       <view class="order-item" v-for="order in orders" :key="order.id" @click="viewOrderDetails(order)">
         <view class="order-header">
-          <text class="order-id">订单编号：{{ order.id }}</text>
+          <text class="order-id">{{ textConfig.orderIdText || '订单编号' }}：{{ order.id }}</text>
           <text class="order-status" :class="order.status">
             {{ getStatusText(order.status) }}
           </text>
         </view>
         <view class="order-info">
-          <text class="user-name">用户：{{ order.userName }}</text>
-          <text class="order-time">下单时间：{{ order.time }}</text>
+          <text class="user-name">{{ textConfig.userText || '用户' }}：{{ order.userName }}</text>
+          <text class="order-time">{{ textConfig.orderTimeText || '下单时间' }}：{{ order.time }}</text>
         </view>
         <view class="order-address">
-          <text class="address-label">配送地址：</text>
+          <text class="address-label">{{ textConfig.deliveryAddressText || '配送地址' }}：</text>
           <text class="address-detail">{{ order.address }}</text>
         </view>
         <view class="product-list">
@@ -28,12 +28,12 @@
           </view>
         </view>
         <view class="order-total">
-          <text class="total-label">总计：</text>
+          <text class="total-label">{{ textConfig.totalText || '总计' }}：</text>
           <text class="total-price">¥{{ order.totalPrice }}</text>
         </view>
         <view class="order-actions" v-if="order.status === 'pending'">
-          <button class="accept-btn" @click.stop="acceptOrder(order)">接受订单</button>
-          <button class="reject-btn" @click.stop="rejectOrder(order)">拒绝订单</button>
+          <button class="accept-btn" @click.stop="acceptOrder(order)">{{ textConfig.acceptOrderText || '接受订单' }}</button>
+          <button class="reject-btn" @click.stop="rejectOrder(order)">{{ textConfig.rejectOrderText || '拒绝订单' }}</button>
         </view>
       </view>
     </view>
@@ -45,7 +45,94 @@ export default {
   data() {
     return {
       searchText: '',
-      orders: [
+      orders: [],
+      textConfig: {}
+    }
+  },
+  
+  onLoad() {
+    this.loadTextConfig()
+    this.loadOrders()
+  },
+  
+  methods: {
+    async loadTextConfig() {
+      try {
+        const res = await this.$request.get('/volunteer/text-config')
+        if (res.code === 200) {
+          this.textConfig = res.data
+          // 设置页面标题
+          uni.setNavigationBarTitle({
+            title: this.textConfig.shoppingPageTitle || '代购服务'
+          })
+        }
+      } catch (error) {
+        console.error('加载文字配置失败:', error)
+        this.setDefaultTextConfig()
+      }
+    },
+    
+    async loadOrders() {
+      try {
+        console.log('开始加载代购订单数据...')
+        
+        // 添加分页参数
+        const res = await this.$request.get('/volunteer/shopping-orders?page=1&size=10')
+        console.log('代购订单接口返回:', res)
+        
+        if (res && res.code === 200) {
+          // 修复：正确获取orders数据
+          this.orders = res.data.orders || []
+          console.log('加载订单成功，订单数量:', this.orders.length)
+          console.log('订单数据:', this.orders)
+        } else {
+          console.error('接口返回错误:', res ? res.message : '接口无响应')
+          // 使用默认数据
+          this.setDefaultOrders()
+        }
+      } catch (error) {
+        console.error('加载订单失败:', error)
+        console.error('错误详情:', error.message)
+        // 使用默认数据
+        this.setDefaultOrders()
+      }
+    },
+    
+    setDefaultTextConfig() {
+      this.textConfig = {
+        searchPlaceholder: '搜索需要代购的商品',
+        searchButton: '搜索',
+        orderIdText: '订单编号',
+        userText: '用户',
+        orderTimeText: '下单时间',
+        deliveryAddressText: '配送地址',
+        totalText: '总计',
+        acceptOrderText: '接受订单',
+        rejectOrderText: '拒绝订单',
+        shoppingPageTitle: '代购服务',
+        statusTexts: {
+          pending: '待接单',
+          accepted: '已接单',
+          completed: '已完成',
+          rejected: '已拒绝'
+        },
+        modalTitles: {
+          acceptOrder: '确认接单',
+          rejectOrder: '确认拒绝'
+        },
+        modalContents: {
+          acceptOrder: '确定要接受这个代购订单吗？',
+          rejectOrder: '确定要拒绝这个代购订单吗？'
+        },
+        toastMessages: {
+          acceptSuccess: '接单成功',
+          rejectSuccess: '拒绝成功'
+        }
+      }
+    },
+    
+    setDefaultOrders() {
+      this.orders = [
         {
           id: 'V20240101001',
           status: 'pending',
@@ -83,54 +170,93 @@ export default {
           totalPrice: 75
         }
       ]
-    }
-  },
-  methods: {
+    },
+    
     search() {
       // 搜索逻辑
       console.log('搜索商品:', this.searchText);
     },
+    
     viewOrderDetails(order) {
       // 查看订单详情
       uni.navigateTo({
         url: `/pages/volunteer/order-details?id=${order.id}`
       });
     },
+    
     getStatusText(status) {
-      const statusMap = {
-        pending: '待接单',
-        accepted: '已接单',
-        completed: '已完成',
-        rejected: '已拒绝'
-      };
-      return statusMap[status] || status;
+      return this.textConfig.statusTexts?.[status] || status;
     },
+    
     acceptOrder(order) {
       uni.showModal({
-        title: '确认接单',
-        content: '确定要接受这个代购订单吗？',
-        success: (res) => {
+        title: this.textConfig.modalTitles?.acceptOrder || '确认接单',
+        content: this.textConfig.modalContents?.acceptOrder || '确定要接受这个代购订单吗？',
+        success: async (res) => {
           if (res.confirm) {
-            order.status = 'accepted';
-            uni.showToast({
-              title: '接单成功',
-              icon: 'success'
-            });
+            try {
+              // 调用后端接口接受订单
+              const response = await this.$request.post(`/volunteer/shopping-orders/${order.id}/accept`);
+              
+              if (response && response.code === 200) {
+                // 更新本地状态
+                order.status = 'accepted';
+                uni.showToast({
+                  title: this.textConfig.toastMessages?.acceptSuccess || '接单成功',
+                  icon: 'success'
+                });
+                // 刷新订单列表
+                this.loadOrders();
+              } else {
+                uni.showToast({
+                  title: response?.message || '接单失败',
+                  icon: 'none'
+                });
+              }
+            } catch (error) {
+              console.error('接单失败:', error);
+              uni.showToast({
+                title: '接单失败，请重试',
+                icon: 'none'
+              });
+            }
           }
         }
       });
     },
+    
     rejectOrder(order) {
       uni.showModal({
-        title: '确认拒绝',
-        content: '确定要拒绝这个代购订单吗？',
-        success: (res) => {
+        title: this.textConfig.modalTitles?.rejectOrder || '确认拒绝',
+        content: this.textConfig.modalContents?.rejectOrder || '确定要拒绝这个代购订单吗？',
+        success: async (res) => {
           if (res.confirm) {
-            order.status = 'rejected';
-            uni.showToast({
-              title: '拒绝成功',
-              icon: 'success'
-            });
+            try {
+              // 调用后端接口拒绝订单
+              const response = await this.$request.post(`/volunteer/shopping-orders/${order.id}/reject`);
+              
+              if (response && response.code === 200) {
+                // 更新本地状态
+                order.status = 'rejected';
+                uni.showToast({
+                  title: this.textConfig.toastMessages?.rejectSuccess || '拒绝成功',
+                  icon: 'success'
+                });
+                // 刷新订单列表
+                this.loadOrders();
+              } else {
+                uni.showToast({
+                  title: response?.message || '拒绝失败',
+                  icon: 'none'
+                });
+              }
+            } catch (error) {
+              console.error('拒绝订单失败:', error);
+              uni.showToast({
+                title: '拒绝失败，请重试',
+                icon: 'none'
+              });
+            }
           }
         }
       });

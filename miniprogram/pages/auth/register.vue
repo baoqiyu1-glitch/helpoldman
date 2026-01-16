@@ -26,11 +26,17 @@
       <view class="form-item">
         <text class="label">用户类型</text>
         <view class="radio-group">
-          <label>
-            <radio value="elder" v-model="form.userType" /> 老人用户
+          <label class="radio-item">
+            <radio value="elder" :checked="form.userType === 'elder'" @click="form.userType = 'elder'" />
+            <text>老人用户</text>
           </label>
-          <label>
-            <radio value="volunteer" v-model="form.userType" /> 志愿者
+          <label class="radio-item">
+            <radio value="volunteer" :checked="form.userType === 'volunteer'" @click="form.userType = 'volunteer'" />
+            <text>志愿者</text>
+          </label>
+          <label class="radio-item">
+            <radio value="family" :checked="form.userType === 'family'" @click="form.userType = 'family'" />
+            <text>家人用户</text>
           </label>
         </view>
       </view>
@@ -54,27 +60,56 @@ export default {
         password: '',
         confirmPassword: '',
         phone: '',
-        userType: 'elder'
+        userType: 'elder' // 默认选择老人用户
       }
     }
   },
   methods: {
     register() {
-      // 注册逻辑
+      // 验证表单
+      if (!this.form.username) {
+        uni.showToast({ title: '请输入用户名', icon: 'none' })
+        return
+      }
+      if (!this.form.password) {
+        uni.showToast({ title: '请输入密码', icon: 'none' })
+        return
+      }
       if (this.form.password !== this.form.confirmPassword) {
         uni.showToast({ title: '两次密码输入不一致', icon: 'none' })
         return
       }
+      if (!this.form.userType) {
+        uni.showToast({ title: '请选择用户类型', icon: 'none' })
+        return
+      }
+      
+      console.log('注册数据:', this.form) // 调试信息
       
       // 调用注册接口
-      this.$request.post('/auth/register', this.form)
-        .then(res => {
-          uni.showToast({ title: '注册成功' })
-          uni.navigateTo({ url: '/pages/auth/login' })
-        })
-        .catch(err => {
-          uni.showToast({ title: err.message || '注册失败', icon: 'none' })
-        })
+      uni.request({
+        url: 'http://localhost:8080/api/auth/register',
+        method: 'POST',
+        data: this.form,
+        header: {
+          'Content-Type': 'application/json'
+        },
+        success: (res) => {
+          console.log('注册响应:', res.data)
+          if (res.data.code === 200) {
+            uni.showToast({ title: '注册成功' })
+            setTimeout(() => {
+              uni.navigateTo({ url: '/pages/auth/login' })
+            }, 1500)
+          } else {
+            uni.showToast({ title: res.data.message || '注册失败', icon: 'none' })
+          }
+        },
+        fail: (err) => {
+          console.error('注册失败:', err)
+          uni.showToast({ title: '网络错误，请重试', icon: 'none' })
+        }
+      })
     },
     goToLogin() {
       uni.navigateTo({ url: '/pages/auth/login' })
@@ -130,7 +165,7 @@ export default {
   padding: 20rpx 0;
 }
 
-.radio-group label {
+.radio-item {
   display: flex;
   align-items: center;
   gap: 10rpx;

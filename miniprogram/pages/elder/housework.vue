@@ -14,9 +14,9 @@
       </view>
       <view class="form-item">
         <text class="label">服务时间</text>
-        <picker mode="date" v-model="order.date" @change="onDateChange">
+        <picker mode="date" v-model="order.serviceTime" @change="onDateChange">
           <view class="picker">
-            {{ order.date }}
+            {{ order.serviceTime }}
           </view>
         </picker>
       </view>
@@ -26,11 +26,11 @@
       </view>
       <view class="form-item">
         <text class="label">联系电话</text>
-        <input type="tel" v-model="order.phone" placeholder="请输入联系电话" />
+        <input type="tel" v-model="order.contactPhone" placeholder="请输入联系电话" />
       </view>
       <view class="form-item">
-        <text class="label">备注</text>
-        <textarea v-model="order.remark" placeholder="请输入服务需求备注" style="height: 150rpx;"></textarea>
+        <text class="label">服务内容</text>
+        <textarea v-model="order.serviceContent" placeholder="请输入服务需求详情" style="height: 150rpx;"></textarea>
       </view>
       
       <view class="total-price">
@@ -43,80 +43,100 @@
 </template>
 
 <script>
+import { houseworkService } from '../../utils/api'
+
 export default {
   data() {
     return {
-      services: [
-        { id: 1, name: '日常打扫', price: 50 },
-        { id: 2, name: '洗衣做饭', price: 80 },
-        { id: 3, name: '整理收纳', price: 60 },
-        { id: 4, name: '家电清洁', price: 100 },
-        { id: 5, name: '其他服务', price: 120 }
-      ],
+      services: [],
       selectedService: null,
       order: {
-        date: '',
+        serviceTime: '',
         address: '',
-        phone: '',
-        remark: ''
+        contactPhone: '',
+        serviceContent: ''
       }
     }
   },
   onLoad() {
+    this.loadServices()
     // 初始化默认日期为今天
     const today = new Date()
     const year = today.getFullYear()
     const month = String(today.getMonth() + 1).padStart(2, '0')
     const day = String(today.getDate()).padStart(2, '0')
-    this.order.date = `${year}-${month}-${day}`
+    this.order.serviceTime = `${year}-${month}-${day}`
   },
   methods: {
+    async loadServices() {
+      try {
+        uni.showLoading({ title: '加载中...' })
+        const res = await houseworkService.getServiceTypes()
+        if (res.code === 200) {
+          this.services = res.data
+        } else {
+          uni.showToast({ title: '加载服务类型失败', icon: 'none' })
+        }
+      } catch (error) {
+        console.error('加载服务类型失败:', error)
+        uni.showToast({ title: '加载失败', icon: 'none' })
+      } finally {
+        uni.hideLoading()
+      }
+    },
     selectService(service) {
       this.selectedService = service
     },
     onDateChange(e) {
-      this.order.date = e.detail.value
+      this.order.serviceTime = e.detail.value
     },
-    submitOrder() {
-      // 提交订单逻辑
+    async submitOrder() {
       if (!this.validateForm()) {
         uni.showToast({ title: '请填写完整信息', icon: 'none' })
         return
       }
       
       const orderData = {
-        serviceId: this.selectedService.id,
-        serviceName: this.selectedService.name,
-        price: this.selectedService.price,
-        ...this.order
+        serviceTypeId: this.selectedService.id,
+        serviceContent: this.order.serviceContent,
+        appointmentTime: this.order.serviceTime,
+        address: this.order.address,
+        contactPhone: this.order.contactPhone
       }
       
-      // 调用API提交订单
-      uni.showLoading({ title: '提交中...' })
-      // 这里需要替换为实际的API调用
-      setTimeout(() => {
+      try {
+        uni.showLoading({ title: '提交中...' })
+        const res = await houseworkService.applyService(orderData)
+        if (res.code === 200) {
+          uni.showToast({ title: '订单提交成功' })
+          this.resetForm()
+        } else {
+          uni.showToast({ title: res.message || '提交失败', icon: 'none' })
+        }
+      } catch (error) {
+        console.error('提交订单失败:', error)
+        uni.showToast({ title: '提交失败', icon: 'none' })
+      } finally {
         uni.hideLoading()
-        uni.showToast({ title: '订单提交成功' })
-        this.resetForm()
-      }, 1000)
+      }
     },
     validateForm() {
-      return this.order.date && this.order.address && this.order.phone
+      return this.order.serviceTime && this.order.address && this.order.contactPhone && this.order.serviceContent
     },
     resetForm() {
       this.selectedService = null
       this.order = {
-        date: '',
+        serviceTime: '',
         address: '',
-        phone: '',
-        remark: ''
+        contactPhone: '',
+        serviceContent: ''
       }
       // 重新设置默认日期
       const today = new Date()
       const year = today.getFullYear()
       const month = String(today.getMonth() + 1).padStart(2, '0')
       const day = String(today.getDate()).padStart(2, '0')
-      this.order.date = `${year}-${month}-${day}`
+      this.order.serviceTime = `${year}-${month}-${day}`
     }
   }
 }

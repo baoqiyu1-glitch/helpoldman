@@ -1,9 +1,9 @@
 <template>
   <view class="profile-container">
     <view class="profile-header">
-      <image class="avatar" src="../../static/images/avatar.png" mode="aspectFill"></image>
+      <image class="avatar" :src="userInfo.avatarUrl || '../../static/images/avatar.png'" mode="aspectFill"></image>
       <view class="user-info">
-        <text class="username">张三</text>
+        <text class="username">{{ userInfo.realName || userInfo.username }}</text>
         <text class="user-type">老人用户</text>
       </view>
     </view>
@@ -11,31 +11,31 @@
     <view class="profile-content">
       <view class="info-item">
         <text class="label">姓名</text>
-        <text class="value">张三</text>
+        <text class="value">{{ userInfo.realName || userInfo.username }}</text>
       </view>
       <view class="info-item">
         <text class="label">年龄</text>
-        <text class="value">78岁</text>
+        <text class="value">{{ userInfo.age ? userInfo.age + '岁' : '' }}</text>
       </view>
       <view class="info-item">
         <text class="label">性别</text>
-        <text class="value">男</text>
+        <text class="value">{{ userInfo.gender }}</text>
       </view>
       <view class="info-item">
         <text class="label">联系电话</text>
-        <text class="value">13800138000</text>
+        <text class="value">{{ userInfo.phone }}</text>
       </view>
       <view class="info-item">
         <text class="label">家庭地址</text>
-        <text class="value">北京市朝阳区XX街道XX小区XX号楼XX单元XX室</text>
+        <text class="value">{{ userInfo.address }}</text>
       </view>
       <view class="info-item">
         <text class="label">紧急联系人</text>
-        <text class="value">李四（儿子）</text>
+        <text class="value">{{ userInfo.emergencyContact }}</text>
       </view>
       <view class="info-item">
         <text class="label">紧急联系电话</text>
-        <text class="value">13900139000</text>
+        <text class="value">{{ userInfo.emergencyPhone }}</text>
       </view>
     </view>
     
@@ -49,18 +49,51 @@
 export default {
   data() {
     return {
-      // 个人信息数据
+      userInfo: {
+        username: '',
+        realName: '',
+        age: '',
+        gender: '',
+        phone: '',
+        address: '',
+        emergencyContact: '',
+        emergencyPhone: '',
+        avatarUrl: ''
+      }
     }
   },
   onLoad() {
     this.loadProfile()
   },
   methods: {
-    loadProfile() {
-      // 加载个人档案数据
+    // 加载个人档案数据
+    async loadProfile() {
+      try {
+        const userInfo = uni.getStorageSync('userInfo')
+        if (userInfo) {
+          this.userInfo = userInfo
+          
+          // 从接口获取最新用户信息
+          const result = await this.$request.get('/auth/current')
+          if (result) {
+            this.userInfo = result
+            // 更新本地存储
+            uni.setStorageSync('userInfo', result)
+          }
+        }
+      } catch (error) {
+        console.error('获取个人信息失败:', error)
+        uni.showToast({
+          title: '获取个人信息失败',
+          icon: 'none'
+        })
+      }
     },
     editProfile() {
       // 跳转到编辑档案页面
+      uni.navigateTo({
+        url: '/pages/elder/personal'
+      })
     }
   }
 }

@@ -55,3 +55,21 @@ body {
   font-size: 32rpx;
 }
 </style>
+
+// 在pages数组中增加家属端页面路由
+pages: [
+  // ... 其他页面
+  {
+    "path": "pages/family/index",
+    "style": {
+      "navigationBarTitleText": "家属首页"
+    }
+  },
+  {
+    "path": "pages/family/donation",
+    "style": {
+      "navigationBarTitleText": "爱心捐赠"
+    }
+  },
+  // ... 其他家属端页面
+]

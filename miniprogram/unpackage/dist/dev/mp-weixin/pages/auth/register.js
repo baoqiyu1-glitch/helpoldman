@@ -103,6 +103,17 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
+  if (!_vm._isMounted) {
+    _vm.e0 = function ($event) {
+      _vm.form.userType = "elder"
+    }
+    _vm.e1 = function ($event) {
+      _vm.form.userType = "volunteer"
+    }
+    _vm.e2 = function ($event) {
+      _vm.form.userType = "family"
+    }
+  }
 }
 var recyclableRender = false
 var staticRenderFns = []
@@ -189,6 +200,12 @@ exports.default = void 0;
 //
 //
 //
+//
+//
+//
+//
+//
+//
 var _default = {
   data: function data() {
     return {
@@ -197,13 +214,28 @@ var _default = {
         password: '',
         confirmPassword: '',
         phone: '',
-        userType: 'elder'
+        userType: 'elder' // 默认选择老人用户
       }
     };
   },
+
   methods: {
     register: function register() {
-      // 注册逻辑
+      // 验证表单
+      if (!this.form.username) {
+        uni.showToast({
+          title: '请输入用户名',
+          icon: 'none'
+        });
+        return;
+      }
+      if (!this.form.password) {
+        uni.showToast({
+          title: '请输入密码',
+          icon: 'none'
+        });
+        return;
+      }
       if (this.form.password !== this.form.confirmPassword) {
         uni.showToast({
           title: '两次密码输入不一致',
@@ -211,20 +243,48 @@ var _default = {
         });
         return;
       }
-
-      // 调用注册接口
-      this.$request.post('/auth/register', this.form).then(function (res) {
+      if (!this.form.userType) {
         uni.showToast({
-          title: '注册成功'
-        });
-        uni.navigateTo({
-          url: '/pages/auth/login'
-        });
-      }).catch(function (err) {
-        uni.showToast({
-          title: err.message || '注册失败',
+          title: '请选择用户类型',
           icon: 'none'
         });
+        return;
+      }
+      console.log('注册数据:', this.form); // 调试信息
+
+      // 调用注册接口
+      uni.request({
+        url: 'http://localhost:8080/api/auth/register',
+        method: 'POST',
+        data: this.form,
+        header: {
+          'Content-Type': 'application/json'
+        },
+        success: function success(res) {
+          console.log('注册响应:', res.data);
+          if (res.data.code === 200) {
+            uni.showToast({
+              title: '注册成功'
+            });
+            setTimeout(function () {
+              uni.navigateTo({
+                url: '/pages/auth/login'
+              });
+            }, 1500);
+          } else {
+            uni.showToast({
+              title: res.data.message || '注册失败',
+              icon: 'none'
+            });
+          }
+        },
+        fail: function fail(err) {
+          console.error('注册失败:', err);
+          uni.showToast({
+            title: '网络错误，请重试',
+            icon: 'none'
+          });
+        }
       });
     },
     goToLogin: function goToLogin() {

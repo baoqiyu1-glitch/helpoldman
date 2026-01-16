@@ -4,6 +4,15 @@
   min-height: 100vh;
   padding: 20rpx;
 }
+.loading.data-v-abb4be80, .error.data-v-abb4be80 {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 32rpx;
+  color: #666;
+}
+.error.data-v-abb4be80 {
+  color: #ff4444;
+}
 .page-header.data-v-abb4be80 {
   text-align: center;
   margin-bottom: 30rpx;
@@ -52,6 +61,7 @@ input.data-v-abb4be80, textarea.data-v-abb4be80 {
   padding: 15rpx 30rpx;
   border: 2rpx solid #ddd;
   border-radius: 25rpx;
+  cursor: pointer;
 }
 .skill-item text.data-v-abb4be80 {
   font-size: 28rpx;

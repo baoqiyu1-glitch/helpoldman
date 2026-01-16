@@ -18,6 +18,12 @@
             }
         },
         {
+            "path": "pages/elder/index",
+            "style": {
+                "navigationBarTitleText": "老人服务"
+            }
+        },
+        {
             "path": "pages/elder/personal",
             "style": {
                 "navigationBarTitleText": "个人中心"
@@ -96,6 +102,12 @@
             }
         },
         {
+            "path": "pages/family/index",
+            "style": {
+                "navigationBarTitleText": "家人首页"
+            }
+        },
+        {
             "path": "pages/family/shopping",
             "style": {
                 "navigationBarTitleText": "代购物资"
@@ -111,36 +123,6 @@
             "path": "pages/family/cooking",
             "style": {
                 "navigationBarTitleText": "做饭送饭"
-            }
-        },
-        {
-            "path": "pages/volunteer/apply",
-            "style": {
-                "navigationBarTitleText": "志愿者申请"
-            }
-        },
-        {
-            "path": "pages/volunteer/profile",
-            "style": {
-                "navigationBarTitleText": "个人档案"
-            }
-        },
-        {
-            "path": "pages/volunteer/shopping",
-            "style": {
-                "navigationBarTitleText": "代购物资"
-            }
-        },
-        {
-            "path": "pages/volunteer/housework",
-            "style": {
-                "navigationBarTitleText": "协助家务"
-            }
-        },
-        {
-            "path": "pages/volunteer/training",
-            "style": {
-                "navigationBarTitleText": "培训技能"
             }
         },
         {
@@ -184,5 +166,58 @@
                 "text": "我的"
             }
         ]
-    }
+    },
+    "subPackages": [{
+        "root": "pages/volunteer",
+        "pages": [{
+                "path": "index",
+                "style": {
+                    "navigationBarTitleText": "志愿者首页",
+                    "enablePullDownRefresh": true
+                }
+            },
+            {
+                "path": "apply",
+                "style": {
+                    "navigationBarTitleText": "志愿者申请"
+                }
+            },
+            {
+                "path": "profile",
+                "style": {
+                    "navigationBarTitleText": "个人档案"
+                }
+            },
+            {
+                "path": "shopping",
+                "style": {
+                    "navigationBarTitleText": "代购物资"
+                }
+            },
+            {
+                "path": "housework",
+                "style": {
+                    "navigationBarTitleText": "协助家务"
+                }
+            },
+            {
+                "path": "training",
+                "style": {
+                    "navigationBarTitleText": "培训技能"
+                }
+            },
+            {
+                "path": "my-tasks",
+                "style": {
+                    "navigationBarTitleText": "我的任务"
+                }
+            },
+            {
+                "path": "order-details",
+                "style": {
+                    "navigationBarTitleText": "订单详情"
+                }
+            }
+        ]
+    }]
 }
